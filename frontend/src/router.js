@@ -13,6 +13,11 @@ const routes = [
 		path: "/account/login",
 		component: () => import("@/pages/Login.vue"),
 	},
+	{
+		name: "OAuthCallback",
+		path: "/oauth/callback",
+		component: () => import("@/pages/OAuthCallback.vue"),
+	},
 ]
 
 const router = createRouter({
@@ -21,8 +26,8 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-	// Allow Home page without authentication (public catalog)
-	if (to.name === "Home") {
+	// Allow Home page and OAuth callback without authentication
+	if (to.name === "Home" || to.name === "OAuthCallback") {
 		next()
 		return
 	}

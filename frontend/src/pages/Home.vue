@@ -308,6 +308,14 @@
         </div>
       </div>
     </div>
+
+    <!-- OAuth Setup Wizard -->
+    <OAuthSetupWizard
+      :show="showSetupWizard"
+      :provider="selectedApp?.oauth_provider || 'google'"
+      @close="closeSetupWizard"
+      @success="handleSetupSuccess"
+    />
   </div>
 </template>
 
@@ -315,11 +323,13 @@
 import { ref, computed } from "vue"
 import { createResource } from "frappe-ui"
 import { session } from "../data/session"
+import OAuthSetupWizard from "../components/OAuthSetupWizard.vue"
 
 const searchQuery = ref("")
 const showAppDialog = ref(false)
 const selectedApp = ref(null)
 const selectedCategory = ref(null)
+const showSetupWizard = ref(false)
 
 // Fetch app catalog
 const catalog = createResource({
@@ -364,10 +374,83 @@ function selectApp(app) {
   showAppDialog.value = true
 }
 
+// OAuth connection resource
+const initiateOAuth = createResource({
+  url: "lodgeick.api.oauth.initiate_oauth",
+  makeParams(values) {
+    return {
+      provider: values.provider,
+      redirect_uri: window.location.origin + "/frontend"
+    }
+  },
+  onSuccess(data) {
+    if (data.authorization_url) {
+      // Open OAuth popup
+      const width = 600
+      const height = 700
+      const left = window.screen.width / 2 - width / 2
+      const top = window.screen.height / 2 - height / 2
+
+      const popup = window.open(
+        data.authorization_url,
+        "OAuth",
+        `width=${width},height=${height},left=${left},top=${top}`
+      )
+
+      // Poll for popup closure
+      const pollTimer = setInterval(() => {
+        if (popup && popup.closed) {
+          clearInterval(pollTimer)
+          // Refresh the page to show connected state
+          catalog.fetch()
+          showAppDialog.value = false
+        }
+      }, 500)
+    }
+  },
+  onError(error) {
+    const errorMsg = error.message || error.toString()
+    // Check if error is due to missing credentials
+    if (errorMsg.includes('not configured') || errorMsg.includes('client_id') || errorMsg.includes('None')) {
+      // Show setup wizard instead of alert
+      showAppDialog.value = false
+      showSetupWizard.value = true
+    } else {
+      alert(`Failed to connect: ${errorMsg}`)
+    }
+  }
+})
+
 function connectApp() {
-  // TODO: Implement OAuth flow
-  alert(`Connecting to ${selectedApp.value.display_name}...`)
-  showAppDialog.value = false
+  if (!selectedApp.value?.oauth_provider) {
+    alert("OAuth provider not configured for this app")
+    return
+  }
+
+  // Try to initiate OAuth
+  initiateOAuth.submit({
+    provider: selectedApp.value.oauth_provider
+  })
+}
+
+function handleOAuthError(error) {
+  // Check if error is due to missing credentials
+  if (error.includes('not configured') || error.includes('client_id') || error.includes('None')) {
+    // Show setup wizard
+    showAppDialog.value = false
+    showSetupWizard.value = true
+  } else {
+    alert(`Failed to connect: ${error}`)
+  }
+}
+
+function closeSetupWizard() {
+  showSetupWizard.value = false
+}
+
+function handleSetupSuccess(credentials) {
+  // Credentials saved, now we can try OAuth again
+  alert(`Credentials saved! You can now click "Connect App" to authenticate.`)
 }
 
 function activateUseCase(useCase) {

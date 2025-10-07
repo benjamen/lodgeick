@@ -123,7 +123,7 @@ def get_provider_config(provider):
 			"client_secret": frappe.conf.get("google_client_secret"),
 			"auth_url": "https://accounts.google.com/o/oauth2/v2/auth",
 			"token_url": "https://oauth2.googleapis.com/token",
-			"scope": "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file"
+			"scope": "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file"
 		},
 		"slack": {
 			"client_id": frappe.conf.get("slack_client_id"),
@@ -183,6 +183,38 @@ def calculate_expiry(expires_in):
 		return None
 
 	return datetime.now() + timedelta(seconds=int(expires_in))
+
+
+@frappe.whitelist()
+def save_oauth_credentials(provider, client_id, client_secret):
+	"""
+	Save OAuth credentials to site config
+
+	Args:
+		provider: Provider name (e.g., 'google', 'xero', 'slack')
+		client_id: OAuth client ID
+		client_secret: OAuth client secret
+
+	Returns:
+		dict: Success status
+	"""
+	# Validate input
+	if not provider or not client_id or not client_secret:
+		frappe.throw(_("Provider, client_id, and client_secret are required"))
+
+	# Update site config
+	frappe.conf[f"{provider}_client_id"] = client_id
+	frappe.conf[f"{provider}_client_secret"] = client_secret
+
+	# Save to site_config.json
+	from frappe.installer import update_site_config
+	update_site_config(f"{provider}_client_id", client_id)
+	update_site_config(f"{provider}_client_secret", client_secret)
+
+	return {
+		"success": True,
+		"message": f"OAuth credentials for {provider} saved successfully"
+	}
 
 
 @frappe.whitelist()

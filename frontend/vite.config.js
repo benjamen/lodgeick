@@ -31,7 +31,7 @@ export default defineConfig({
 		host: '0.0.0.0',
 		proxy: {
 			"^/(app|api|assets|files)": {
-				target: "http://172.19.0.5:8090",
+				target: "http://127.0.0.1:8090",
 				ws: true,
 				changeOrigin: true,
 			},
