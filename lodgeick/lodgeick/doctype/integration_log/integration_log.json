@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2025-10-08 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "integration",
+  "status",
+  "message",
+  "execution_time",
+  "timestamp"
+ ],
+ "fields": [
+  {
+   "fieldname": "integration",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Integration",
+   "options": "User Integration",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Started\nSuccess\nError\nWarning",
+   "reqd": 1
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Message"
+  },
+  {
+   "fieldname": "execution_time",
+   "fieldtype": "Float",
+   "label": "Execution Time (seconds)"
+  },
+  {
+   "default": "Now",
+   "fieldname": "timestamp",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Timestamp"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Lodgeick",
+ "name": "Integration Log",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

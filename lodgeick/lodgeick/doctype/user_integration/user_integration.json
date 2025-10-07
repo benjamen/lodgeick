@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2025-10-08 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "flow_name",
+  "source_app",
+  "target_app",
+  "config",
+  "workflow_id",
+  "status",
+  "last_run",
+  "error_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "flow_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Flow Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "source_app",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Source App"
+  },
+  {
+   "fieldname": "target_app",
+   "fieldtype": "Data",
+   "label": "Target App"
+  },
+  {
+   "fieldname": "config",
+   "fieldtype": "Long Text",
+   "label": "Configuration (JSON)"
+  },
+  {
+   "fieldname": "workflow_id",
+   "fieldtype": "Data",
+   "label": "Workflow ID (n8n)"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Active\nPaused\nError\nCompleted"
+  },
+  {
+   "fieldname": "last_run",
+   "fieldtype": "Datetime",
+   "label": "Last Run"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Text",
+   "label": "Error Message"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-10-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Lodgeick",
+ "name": "User Integration",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

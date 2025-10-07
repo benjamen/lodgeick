@@ -1,0 +1,241 @@
+"""
+OAuth authentication handler for Lodgeick integrations
+Handles OAuth flows for various providers
+"""
+
+import frappe
+from frappe import _
+import requests
+import json
+from datetime import datetime, timedelta
+
+
+@frappe.whitelist(allow_guest=True)
+def initiate_oauth(provider, redirect_uri=None):
+	"""
+	Initiate OAuth flow for a provider
+
+	Args:
+		provider: Provider name (e.g., 'xero', 'google', 'slack')
+		redirect_uri: Optional redirect URI after OAuth
+
+	Returns:
+		dict: Authorization URL and state token
+	"""
+	# Get provider config
+	provider_config = get_provider_config(provider)
+
+	if not provider_config:
+		frappe.throw(_("Provider {0} not configured").format(provider))
+
+	# Generate state token for CSRF protection
+	state = frappe.generate_hash(length=32)
+
+	# Store state in cache (expires in 10 minutes)
+	frappe.cache().setex(f"oauth_state:{state}", 600, json.dumps({
+		"provider": provider,
+		"user": frappe.session.user,
+		"redirect_uri": redirect_uri
+	}))
+
+	# Build authorization URL
+	auth_url = build_auth_url(provider_config, state, redirect_uri)
+
+	return {
+		"success": True,
+		"authorization_url": auth_url,
+		"state": state
+	}
+
+
+@frappe.whitelist(allow_guest=True)
+def oauth_callback(code, state, provider):
+	"""
+	Handle OAuth callback
+
+	Args:
+		code: Authorization code from provider
+		state: State token for CSRF protection
+		provider: Provider name
+
+	Returns:
+		dict: Success status and redirect URL
+	"""
+	# Verify state token
+	state_data = frappe.cache().get(f"oauth_state:{state}")
+
+	if not state_data:
+		frappe.throw(_("Invalid or expired OAuth state"))
+
+	state_data = json.loads(state_data)
+
+	if state_data.get("provider") != provider:
+		frappe.throw(_("Provider mismatch"))
+
+	# Exchange code for tokens
+	provider_config = get_provider_config(provider)
+	tokens = exchange_code_for_tokens(provider_config, code, state_data.get("redirect_uri"))
+
+	# Store tokens in Integration Token doctype
+	token_doc = frappe.get_doc({
+		"doctype": "Integration Token",
+		"user": state_data.get("user"),
+		"provider": provider,
+		"access_token": tokens.get("access_token"),
+		"refresh_token": tokens.get("refresh_token"),
+		"expires_at": calculate_expiry(tokens.get("expires_in")),
+		"token_data": json.dumps(tokens)
+	})
+	token_doc.insert(ignore_permissions=True)
+	frappe.db.commit()
+
+	# Clear state from cache
+	frappe.cache().delete(f"oauth_state:{state}")
+
+	return {
+		"success": True,
+		"message": "OAuth authentication successful",
+		"redirect_uri": state_data.get("redirect_uri") or "/app"
+	}
+
+
+def get_provider_config(provider):
+	"""
+	Get OAuth configuration for a provider
+
+	Args:
+		provider: Provider name
+
+	Returns:
+		dict: Provider configuration
+	"""
+	# TODO: Move these to Site Config or Settings DocType
+	configs = {
+		"xero": {
+			"client_id": frappe.conf.get("xero_client_id"),
+			"client_secret": frappe.conf.get("xero_client_secret"),
+			"auth_url": "https://login.xero.com/identity/connect/authorize",
+			"token_url": "https://identity.xero.com/connect/token",
+			"scope": "accounting.transactions accounting.contacts offline_access"
+		},
+		"google": {
+			"client_id": frappe.conf.get("google_client_id"),
+			"client_secret": frappe.conf.get("google_client_secret"),
+			"auth_url": "https://accounts.google.com/o/oauth2/v2/auth",
+			"token_url": "https://oauth2.googleapis.com/token",
+			"scope": "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file"
+		},
+		"slack": {
+			"client_id": frappe.conf.get("slack_client_id"),
+			"client_secret": frappe.conf.get("slack_client_secret"),
+			"auth_url": "https://slack.com/oauth/v2/authorize",
+			"token_url": "https://slack.com/api/oauth.v2.access",
+			"scope": "channels:read channels:write chat:write"
+		}
+	}
+
+	return configs.get(provider)
+
+
+def build_auth_url(config, state, redirect_uri=None):
+	"""Build OAuth authorization URL"""
+	if not redirect_uri:
+		redirect_uri = frappe.utils.get_url(f"/api/method/lodgeick.api.oauth.oauth_callback")
+
+	params = {
+		"client_id": config["client_id"],
+		"redirect_uri": redirect_uri,
+		"scope": config["scope"],
+		"state": state,
+		"response_type": "code",
+		"access_type": "offline",  # For refresh tokens
+		"prompt": "consent"
+	}
+
+	from urllib.parse import urlencode
+	return f"{config['auth_url']}?{urlencode(params)}"
+
+
+def exchange_code_for_tokens(config, code, redirect_uri):
+	"""Exchange authorization code for access and refresh tokens"""
+	if not redirect_uri:
+		redirect_uri = frappe.utils.get_url(f"/api/method/lodgeick.api.oauth.oauth_callback")
+
+	data = {
+		"client_id": config["client_id"],
+		"client_secret": config["client_secret"],
+		"code": code,
+		"grant_type": "authorization_code",
+		"redirect_uri": redirect_uri
+	}
+
+	response = requests.post(config["token_url"], data=data)
+
+	if response.status_code != 200:
+		frappe.throw(_("Failed to exchange code for tokens: {0}").format(response.text))
+
+	return response.json()
+
+
+def calculate_expiry(expires_in):
+	"""Calculate token expiry datetime"""
+	if not expires_in:
+		return None
+
+	return datetime.now() + timedelta(seconds=int(expires_in))
+
+
+@frappe.whitelist()
+def refresh_token(provider, user=None):
+	"""
+	Refresh an expired OAuth token
+
+	Args:
+		provider: Provider name
+		user: User (defaults to current user)
+
+	Returns:
+		dict: New token data
+	"""
+	if not user:
+		user = frappe.session.user
+
+	# Get existing token
+	token_doc = frappe.get_doc("Integration Token", {
+		"user": user,
+		"provider": provider
+	})
+
+	if not token_doc.refresh_token:
+		frappe.throw(_("No refresh token available"))
+
+	provider_config = get_provider_config(provider)
+
+	# Request new access token
+	data = {
+		"client_id": provider_config["client_id"],
+		"client_secret": provider_config["client_secret"],
+		"refresh_token": token_doc.get_password("refresh_token"),
+		"grant_type": "refresh_token"
+	}
+
+	response = requests.post(provider_config["token_url"], data=data)
+
+	if response.status_code != 200:
+		frappe.throw(_("Failed to refresh token: {0}").format(response.text))
+
+	tokens = response.json()
+
+	# Update token document
+	token_doc.access_token = tokens.get("access_token")
+	if tokens.get("refresh_token"):
+		token_doc.refresh_token = tokens.get("refresh_token")
+	token_doc.expires_at = calculate_expiry(tokens.get("expires_in"))
+	token_doc.token_data = json.dumps(tokens)
+	token_doc.save(ignore_permissions=True)
+	frappe.db.commit()
+
+	return {
+		"success": True,
+		"message": "Token refreshed successfully"
+	}
