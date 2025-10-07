@@ -8,6 +8,7 @@ import {
 	Alert,
 	Badge,
 	Button,
+	Card,
 	Dialog,
 	ErrorMessage,
 	FormControl,
@@ -20,9 +21,12 @@ import {
 } from "frappe-ui"
 
 import "./index.css"
+import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap"
 
 const globalComponents = {
 	Button,
+	Card,
 	TextInput,
 	Input,
 	FormControl,

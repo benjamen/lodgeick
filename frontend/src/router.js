@@ -21,6 +21,12 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+	// Allow Home page without authentication (public catalog)
+	if (to.name === "Home") {
+		next()
+		return
+	}
+
 	let isLoggedIn = session.isLoggedIn
 	try {
 		await userResource.promise

@@ -7,14 +7,7 @@ import { defineConfig } from "vite"
 export default defineConfig({
 	plugins: [
 		frappeui({
-			frappeProxy: true,
-			jinjaBootData: true,
 			lucideIcons: true,
-			buildConfig: {
-				indexHtmlPath: "../<app-name>/www/frontend.html",
-				emptyOutDir: true,
-				sourcemap: true,
-			},
 		}),
 		vue(),
 	],
@@ -35,6 +28,13 @@ export default defineConfig({
 		include: ["feather-icons", "showdown", "highlight.js/lib/core", "interactjs"],
 	},
 	server: {
-		allowedHosts: true,
+		host: '0.0.0.0',
+		proxy: {
+			"^/(app|api|assets|files)": {
+				target: "http://172.19.0.5:8090",
+				ws: true,
+				changeOrigin: true,
+			},
+		},
 	},
 })
