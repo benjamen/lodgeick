@@ -36,7 +36,7 @@ jobs:
 
             # Clean up old build artifacts with wrong path
             echo '🧹 Cleaning up old build artifacts...'
-            rm -rf '<app-name>/public/frontend' 2>/dev/null || true
+            sudo rm -rf '<app-name>/public/frontend' 2>/dev/null || true
 
             # Pull latest code from the GitHub repo
             echo '📥 Pulling latest code...'
