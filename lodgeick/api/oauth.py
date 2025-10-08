@@ -149,7 +149,49 @@ def get_provider_config(provider):
 	Returns:
 		dict: Provider configuration
 	"""
-	# TODO: Move these to Site Config or Settings DocType
+	# Try to get from User Integration Settings first
+	try:
+		settings = frappe.get_single("User Integration Settings")
+		provider_settings = None
+
+		for cred in settings.oauth_credentials:
+			if cred.provider == provider:
+				provider_settings = cred
+				break
+
+		if provider_settings and provider_settings.client_id and provider_settings.client_secret:
+			# Provider-specific configurations
+			provider_configs = {
+				"xero": {
+					"auth_url": "https://login.xero.com/identity/connect/authorize",
+					"token_url": "https://identity.xero.com/connect/token",
+					"scope": "accounting.transactions accounting.contacts offline_access"
+				},
+				"google": {
+					"auth_url": "https://accounts.google.com/o/oauth2/v2/auth",
+					"token_url": "https://oauth2.googleapis.com/token",
+					"scope": "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file"
+				},
+				"slack": {
+					"auth_url": "https://slack.com/oauth/v2/authorize",
+					"token_url": "https://slack.com/api/oauth.v2.access",
+					"scope": "channels:read channels:write chat:write"
+				},
+				"hubspot": {
+					"auth_url": "https://app.hubspot.com/oauth/authorize",
+					"token_url": "https://api.hubapi.com/oauth/v1/token",
+					"scope": "crm.objects.contacts.read crm.objects.contacts.write"
+				}
+			}
+
+			config = provider_configs.get(provider, {})
+			config["client_id"] = provider_settings.client_id
+			config["client_secret"] = provider_settings.client_secret
+			return config
+	except Exception as e:
+		frappe.log_error(f"Error getting provider config from settings: {str(e)}")
+
+	# Fallback to frappe.conf
 	configs = {
 		"xero": {
 			"client_id": frappe.conf.get("xero_client_id"),
