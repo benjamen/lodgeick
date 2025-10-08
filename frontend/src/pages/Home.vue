@@ -439,9 +439,18 @@ const initiateOAuth = createResource({
     }
   },
   onError(error) {
-    const errorMsg = error.message || error.toString()
+    // Extract error message from frappe error object
+    let errorMsg = ''
+    if (error.messages && error.messages.length > 0) {
+      errorMsg = error.messages[0]
+    } else if (error.message) {
+      errorMsg = error.message
+    } else {
+      errorMsg = error.toString()
+    }
+
     // Check if error is due to missing credentials
-    if (errorMsg.includes('not configured') || errorMsg.includes('client_id') || errorMsg.includes('None')) {
+    if (errorMsg.includes('not configured') || errorMsg.includes('credentials') || errorMsg.includes('None')) {
       // Show setup wizard instead of alert
       showAppDialog.value = false
       showSetupWizard.value = true
