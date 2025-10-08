@@ -149,9 +149,9 @@ def get_provider_config(provider):
 	Returns:
 		dict: Provider configuration
 	"""
-	# Try to get from User Integration Settings first
+	# Try to get from OAuth Credentials Settings first
 	try:
-		settings = frappe.get_single("User Integration Settings")
+		settings = frappe.get_single("OAuth Credentials Settings")
 		provider_settings = None
 
 		for cred in settings.oauth_credentials:
