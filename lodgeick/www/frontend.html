@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Lodgeick - One-Click Integrations</title>
-	<link rel="icon" type="image/svg+xml" href="/assets/lodgeick/frontend/favicon.ico">
-</head>
-<body>
-	<div id="app"></div>
-	<script type="module" src="/assets/lodgeick/frontend/assets/index.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/assets/lodgeick/frontend/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lodgeick - One-Click Integrations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script type="module" crossorigin src="/assets/lodgeick/frontend/assets/index-CAM7KmQA.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/lodgeick/frontend/assets/index-DcPcrdZg.css">
+  </head>
+  <body>
+    <div id="app"></div>
+
+          <script>
+              {% for key in boot %}
+              window["{{ key }}"] = {{ boot[key] | tojson }};
+              {% endfor %}
+          </script>
+          </body>
+
 </html>
