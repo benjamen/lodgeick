@@ -28,6 +28,10 @@ def initiate_oauth(provider, redirect_uri=None):
 	if not provider_config:
 		frappe.throw(_("Provider {0} not configured").format(provider))
 
+	# Check if credentials are configured
+	if not provider_config.get("client_id") or not provider_config.get("client_secret"):
+		frappe.throw(_("OAuth credentials for {0} not configured. Please set up OAuth credentials first.").format(provider))
+
 	# Generate state token for CSRF protection
 	state = frappe.generate_hash(length=32)
 
