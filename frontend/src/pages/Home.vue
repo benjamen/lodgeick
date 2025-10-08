@@ -16,14 +16,31 @@
         </button>
         <div class="collapse navbar-collapse" id="navigation">
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link text-white">{{ session.user }}</a>
-            </li>
-            <li class="nav-item">
-              <button @click="session.logout.submit()" class="btn btn-sm btn-white mb-0">
-                Logout
-              </button>
-            </li>
+            <!-- Show when logged in -->
+            <template v-if="session.isLoggedIn">
+              <li class="nav-item">
+                <a class="nav-link text-white">{{ session.user }}</a>
+              </li>
+              <li class="nav-item">
+                <button @click="session.logout.submit()" class="btn btn-sm btn-white mb-0">
+                  Logout
+                </button>
+              </li>
+            </template>
+
+            <!-- Show when not logged in -->
+            <template v-else>
+              <li class="nav-item">
+                <router-link to="/account/login" class="nav-link text-white">
+                  Sign In
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/account/signup" class="btn btn-sm btn-white mb-0">
+                  Create Account
+                </router-link>
+              </li>
+            </template>
           </ul>
         </div>
       </div>
