@@ -34,10 +34,6 @@ jobs:
 
             cd /home/frappe-user/frappe-bench/apps/lodgeick
 
-            # Clean up old build artifacts with wrong path
-            echo '🧹 Cleaning up old build artifacts...'
-            sudo rm -rf '<app-name>/public/frontend' 2>/dev/null || true
-
             # Pull latest code from the GitHub repo
             echo '📥 Pulling latest code...'
             git remote remove origin 2>/dev/null || true
@@ -45,10 +41,6 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
-
-            # Fix permissions for frontend directory
-            echo '🔧 Fixing permissions...'
-            sudo chown -R frappe-user:frappe-user /home/frappe-user/frappe-bench/apps/lodgeick
 
             # Install/update frontend dependencies
             echo '📦 Installing frontend dependencies...'
@@ -68,12 +60,7 @@ jobs:
             echo '🧹 Clearing cache...'
             bench --site lodgeick.com clear-cache
             echo '🔄 Restarting services...'
-            sudo supervisorctl restart all || bench restart || echo 'Restart attempted'
-
-            # Give services time to restart
-            sleep 5
-
-            sudo systemctl reload nginx
+            bench restart
 
             echo '✅ Lodgeick deployment completed successfully!'
             echo '🌐 Dashboard available at: https://lodgeick.com'
