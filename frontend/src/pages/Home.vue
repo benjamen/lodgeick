@@ -331,6 +331,50 @@
       @close="closeSetupWizard"
       @success="handleSetupSuccess"
     />
+
+    <!-- Authentication Required Modal -->
+    <div
+      class="modal fade"
+      :class="{ show: showAuthModal, 'd-block': showAuthModal }"
+      tabindex="-1"
+      :style="{ backgroundColor: showAuthModal ? 'rgba(0,0,0,0.5)' : '' }"
+      @click.self="showAuthModal = false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-gradient-primary">
+            <h5 class="modal-title text-white font-weight-bold">
+              <i class="fas fa-lock me-2"></i>
+              Authentication Required
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              @click="showAuthModal = false"
+            ></button>
+          </div>
+          <div class="modal-body p-4 text-center">
+            <div class="icon icon-shape bg-gradient-primary shadow-primary rounded-circle mx-auto mb-4">
+              <i class="fas fa-user-plus text-2xl opacity-10 text-white"></i>
+            </div>
+            <h4 class="font-weight-bold mb-3">Sign in to Connect Apps</h4>
+            <p class="text-muted mb-4">
+              Create a free account or sign in to save your app connections and start automating your workflows.
+            </p>
+            <div class="d-grid gap-2">
+              <router-link to="/account/signup" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus me-2"></i>
+                Create Free Account
+              </router-link>
+              <router-link to="/account/login" class="btn btn-outline-secondary">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Sign In
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -345,6 +389,7 @@ const showAppDialog = ref(false)
 const selectedApp = ref(null)
 const selectedCategory = ref(null)
 const showSetupWizard = ref(false)
+const showAuthModal = ref(false)
 
 // Fetch app catalog
 const catalog = createResource({
@@ -464,9 +509,9 @@ const initiateOAuth = createResource({
 function connectApp() {
   // Check if user is logged in
   if (!session.isLoggedIn) {
-    if (confirm("You need to be logged in to connect apps. Would you like to login now?")) {
-      window.location.href = "/frontend/account/login"
-    }
+    // Close the app dialog and show auth modal
+    showAppDialog.value = false
+    showAuthModal.value = true
     return
   }
 

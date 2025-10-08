@@ -14,6 +14,11 @@ const routes = [
 		component: () => import("@/pages/Login.vue"),
 	},
 	{
+		name: "Signup",
+		path: "/account/signup",
+		component: () => import("@/pages/Signup.vue"),
+	},
+	{
 		name: "OAuthCallback",
 		path: "/oauth/callback",
 		component: () => import("@/pages/OAuthCallback.vue"),
@@ -26,8 +31,8 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-	// Allow Home page (catalog browsing) and OAuth callback without authentication
-	if (to.name === "Home" || to.name === "OAuthCallback") {
+	// Allow Home page (catalog browsing), Signup, Login, and OAuth callback without authentication
+	if (to.name === "Home" || to.name === "OAuthCallback" || to.name === "Signup" || to.name === "Login") {
 		next()
 		return
 	}
@@ -40,10 +45,10 @@ router.beforeEach(async (to, from, next) => {
 		isLoggedIn = false
 	}
 
-	// Redirect logic
-	if (to.name === "Login" && isLoggedIn) {
+	// Redirect logic - redirect to home if already logged in
+	if ((to.name === "Login" || to.name === "Signup") && isLoggedIn) {
 		next({ name: "Home" })
-	} else if (to.name !== "Login" && !isLoggedIn) {
+	} else if (!isLoggedIn) {
 		next({ name: "Login" })
 	} else {
 		next()
