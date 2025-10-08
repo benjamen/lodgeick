@@ -11,11 +11,6 @@ const targetPath = path.join(__dirname, '..', 'lodgeick', 'www', 'frontend.html'
 
 let html = fs.readFileSync(builtIndexPath, 'utf-8');
 
-// Update asset paths to include /assets/lodgeick/frontend/
-html = html.replace(/src="\/assets\//g, 'src="/assets/lodgeick/frontend/assets/');
-html = html.replace(/href="\/assets\//g, 'href="/assets/lodgeick/frontend/assets/');
-html = html.replace(/href="\/favicon\.png"/g, 'href="/assets/lodgeick/frontend/favicon.png"');
-
 // Add Frappe boot script before </body>
 const bootScript = `
           <script>
