@@ -46,6 +46,10 @@ jobs:
             git reset --hard origin/main
             git clean -fd
 
+            # Fix permissions for frontend directory
+            echo '🔧 Fixing permissions...'
+            sudo chown -R frappe-user:frappe-user /home/frappe-user/frappe-bench/apps/lodgeick
+
             # Install/update frontend dependencies
             echo '📦 Installing frontend dependencies...'
             cd frontend
