@@ -87,6 +87,42 @@ def oauth_callback(code, state, provider):
 		"token_data": json.dumps(tokens)
 	})
 	token_doc.insert(ignore_permissions=True)
+
+	# Create or update User Integration Settings
+	try:
+		# Find the app that uses this provider
+		app = frappe.db.get_value("App Catalog", {"oauth_provider": provider}, "name")
+
+		if app:
+			# Check if settings already exist
+			existing_settings = frappe.db.get_value(
+				"User Integration Settings",
+				{"user": state_data.get("user"), "app_name": app},
+				"name"
+			)
+
+			if existing_settings:
+				# Update existing
+				settings_doc = frappe.get_doc("User Integration Settings", existing_settings)
+				settings_doc.is_active = 1
+				settings_doc.save(ignore_permissions=True)
+			else:
+				# Create new
+				settings_doc = frappe.get_doc({
+					"doctype": "User Integration Settings",
+					"user": state_data.get("user"),
+					"app_name": app,
+					"is_active": 1,
+					"settings": json.dumps({
+						"connected_at": datetime.now().isoformat(),
+						"provider": provider
+					})
+				})
+				settings_doc.insert(ignore_permissions=True)
+	except Exception as e:
+		# Don't fail the OAuth flow if settings creation fails
+		frappe.log_error(f"Failed to create User Integration Settings: {str(e)}")
+
 	frappe.db.commit()
 
 	# Clear state from cache

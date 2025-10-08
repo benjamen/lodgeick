@@ -26,12 +26,13 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-	// Allow Home page and OAuth callback without authentication
+	// Allow Home page (catalog browsing) and OAuth callback without authentication
 	if (to.name === "Home" || to.name === "OAuthCallback") {
 		next()
 		return
 	}
 
+	// Check if user is logged in
 	let isLoggedIn = session.isLoggedIn
 	try {
 		await userResource.promise
@@ -39,6 +40,7 @@ router.beforeEach(async (to, from, next) => {
 		isLoggedIn = false
 	}
 
+	// Redirect logic
 	if (to.name === "Login" && isLoggedIn) {
 		next({ name: "Home" })
 	} else if (to.name !== "Login" && !isLoggedIn) {

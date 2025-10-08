@@ -205,7 +205,12 @@
                     <i class="fas fa-puzzle-piece me-1"></i>
                     {{ app.use_cases?.length || 0 }} use cases
                   </small>
-                  <i class="fas fa-arrow-right text-primary"></i>
+                  <div>
+                    <span v-if="app.isConnected" class="badge bg-gradient-success me-2">
+                      <i class="fas fa-check me-1"></i>Connected
+                    </span>
+                    <i class="fas fa-arrow-right text-primary"></i>
+                  </div>
                 </div>
               </div>
             </div>
@@ -297,12 +302,22 @@
               Close
             </button>
             <button
+              v-if="!selectedApp?.isConnected"
               type="button"
               class="btn btn-primary"
               @click="connectApp"
             >
               <i class="fas fa-plug me-2"></i>
               Connect App
+            </button>
+            <button
+              v-else
+              type="button"
+              class="btn btn-success"
+              disabled
+            >
+              <i class="fas fa-check me-2"></i>
+              Connected
             </button>
           </div>
         </div>
@@ -337,6 +352,12 @@ const catalog = createResource({
   auto: true,
 })
 
+// Fetch user's connected integrations
+const userIntegrations = createResource({
+  url: "lodgeick.lodgeick.doctype.user_integration_settings.user_integration_settings.get_user_integrations",
+  auto: session.isLoggedIn,
+})
+
 // Get unique categories
 const categories = computed(() => {
   if (!catalog.data?.apps) return [null]
@@ -344,11 +365,20 @@ const categories = computed(() => {
   return cats
 })
 
+// Check if app is connected
+function isAppConnected(appName) {
+  if (!userIntegrations.data) return false
+  return userIntegrations.data.some(integration => integration.app_name === appName)
+}
+
 // Filter apps based on search and category
 const filteredApps = computed(() => {
   if (!catalog.data?.apps) return []
 
-  let apps = catalog.data.apps
+  let apps = catalog.data.apps.map(app => ({
+    ...app,
+    isConnected: isAppConnected(app.name)
+  }))
 
   // Filter by category
   if (selectedCategory.value) {
@@ -422,6 +452,14 @@ const initiateOAuth = createResource({
 })
 
 function connectApp() {
+  // Check if user is logged in
+  if (!session.isLoggedIn) {
+    if (confirm("You need to be logged in to connect apps. Would you like to login now?")) {
+      window.location.href = "/frontend/account/login"
+    }
+    return
+  }
+
   if (!selectedApp.value?.oauth_provider) {
     alert("OAuth provider not configured for this app")
     return
