@@ -219,6 +219,48 @@ def get_provider_config(provider):
 	return configs.get(provider)
 
 
+@frappe.whitelist()
+def save_oauth_credentials(credentials):
+	"""
+	Save OAuth credentials to OAuth Credentials Settings
+
+	Args:
+		credentials: List of credentials [{provider, client_id, client_secret}]
+
+	Returns:
+		dict: Success status
+	"""
+	if isinstance(credentials, str):
+		credentials = json.loads(credentials)
+
+	# Get or create OAuth Credentials Settings
+	if frappe.db.exists("OAuth Credentials Settings", "OAuth Credentials Settings"):
+		settings = frappe.get_doc("OAuth Credentials Settings", "OAuth Credentials Settings")
+	else:
+		settings = frappe.get_doc({
+			"doctype": "OAuth Credentials Settings"
+		})
+
+	# Clear existing credentials
+	settings.oauth_credentials = []
+
+	# Add new credentials
+	for cred in credentials:
+		settings.append("oauth_credentials", {
+			"provider": cred.get("provider"),
+			"client_id": cred.get("client_id"),
+			"client_secret": cred.get("client_secret")
+		})
+
+	settings.save(ignore_permissions=True)
+	frappe.db.commit()
+
+	return {
+		"success": True,
+		"message": "OAuth credentials saved successfully"
+	}
+
+
 def build_auth_url(config, state, redirect_uri=None):
 	"""Build OAuth authorization URL"""
 	if not redirect_uri:

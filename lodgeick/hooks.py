@@ -61,12 +61,14 @@ home_page = "lodgeick"
 
 # website user home page (by Role)
 role_home_page = {
-	"Guest": "lodgeick"
+	"Guest": "lodgeick",
+	"System Manager": "lodgeick"
 }
 
 # Website route rules
 website_route_rules = [
-	{"from_route": "/lodgeick/<path:app_path>", "to_route": "lodgeick"},
+	{"from_route": "/", "to_route": "lodgeick"},
+	{"from_route": "/<path:app_path>", "to_route": "lodgeick"},
 ]
 
 # Generators
