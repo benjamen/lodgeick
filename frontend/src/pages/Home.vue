@@ -454,8 +454,8 @@ const initiateOAuth = createResource({
   url: "lodgeick.api.oauth.initiate_oauth",
   makeParams(values) {
     return {
-      provider: values.provider,
-      redirect_uri: window.location.origin + "/frontend"
+      provider: values.provider
+      // Let backend determine redirect_uri automatically
     }
   },
   onSuccess(data) {
