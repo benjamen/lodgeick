@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 // Read the built index.html
 const builtIndexPath = path.join(__dirname, '..', 'lodgeick', 'public', 'frontend', 'index.html');
-const targetPath = path.join(__dirname, '..', 'lodgeick', 'www', 'frontend.html');
+const targetPath = path.join(__dirname, '..', 'lodgeick', 'www', 'lodgeick.html');
 
 let html = fs.readFileSync(builtIndexPath, 'utf-8');
 
@@ -21,7 +21,7 @@ const bootScript = `
 
 html = html.replace('</body>', `${bootScript}\n          </body>`);
 
-// Write to www/frontend.html
+// Write to www/lodgeick.html
 fs.writeFileSync(targetPath, html);
 
-console.log('✅ Copied and updated frontend.html');
+console.log('✅ Copied and updated lodgeick.html');

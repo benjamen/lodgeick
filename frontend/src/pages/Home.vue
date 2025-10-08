@@ -451,7 +451,8 @@ const initiateOAuth = createResource({
 
     // Check if error is due to missing credentials
     if (errorMsg.includes('not configured') || errorMsg.includes('credentials') || errorMsg.includes('None')) {
-      // Show setup wizard instead of alert
+      // Show setup wizard instead of alert (this is expected behavior)
+      console.log('OAuth credentials not configured, opening setup wizard...')
       showAppDialog.value = false
       showSetupWizard.value = true
     } else {

@@ -57,16 +57,16 @@ app_license = "mit"
 # ----------
 
 # application home page (will override Website Settings)
-home_page = "frontend"
+home_page = "lodgeick"
 
 # website user home page (by Role)
 role_home_page = {
-	"Guest": "frontend"
+	"Guest": "lodgeick"
 }
 
 # Website route rules
 website_route_rules = [
-	{"from_route": "/frontend/<path:app_path>", "to_route": "frontend"},
+	{"from_route": "/lodgeick/<path:app_path>", "to_route": "lodgeick"},
 ]
 
 # Generators
