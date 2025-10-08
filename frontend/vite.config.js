@@ -13,7 +13,7 @@ export default defineConfig({
 	],
 	build: {
 		chunkSizeWarningLimit: 1500,
-		outDir: "../<app-name>/public/frontend",
+		outDir: "../lodgeick/public/frontend",
 		emptyOutDir: true,
 		target: "es2015",
 		sourcemap: true,
