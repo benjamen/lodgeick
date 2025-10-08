@@ -1,2 +1,25 @@
 @import "./assets/Inter/inter.css";
 @import "frappe-ui/src/style.css";
+
+/* Global styles for consistent rendering */
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure min-vh works consistently */
+.min-vh-75 {
+  min-height: 75vh !important;
+}
+
+.min-vh-100 {
+  min-height: 100vh !important;
+}
+
+/* Page header base styles */
+.page-header {
+  padding-top: 7rem;
+  padding-bottom: 7rem;
+}
