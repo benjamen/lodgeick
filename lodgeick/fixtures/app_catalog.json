@@ -1,0 +1,67 @@
+[
+ {
+  "doctype": "App Catalog",
+  "name": "xero",
+  "app_name": "xero",
+  "display_name": "Xero",
+  "app_description": "Cloud-based accounting software for small and medium businesses",
+  "category": "Accounting",
+  "logo_url": "https://www.xero.com/content/dam/xero/pilot-images/logos/xero-logo.svg",
+  "oauth_provider": "xero",
+  "is_active": 1,
+  "use_cases": [
+   {
+    "use_case_name": "Sync invoices to Google Sheets",
+    "use_case_description": "Automatically sync Xero invoices to a Google Sheets spreadsheet",
+    "workflow_template_id": "xero_sheets_sync"
+   }
+  ]
+ },
+ {
+  "doctype": "App Catalog",
+  "name": "google_sheets",
+  "app_name": "google_sheets",
+  "display_name": "Google Sheets",
+  "app_description": "Cloud-based spreadsheet application",
+  "category": "Productivity",
+  "logo_url": "https://www.gstatic.com/images/branding/product/2x/sheets_2020q4_48dp.png",
+  "oauth_provider": "google",
+  "is_active": 1
+ },
+ {
+  "doctype": "App Catalog",
+  "name": "hubspot",
+  "app_name": "hubspot",
+  "display_name": "HubSpot",
+  "app_description": "CRM and marketing automation platform",
+  "category": "CRM",
+  "logo_url": "https://a.slack-edge.com/80588/img/services/hubspot_512.png",
+  "oauth_provider": "hubspot",
+  "is_active": 1,
+  "use_cases": [
+   {
+    "use_case_name": "Sync contacts to Google Sheets",
+    "use_case_description": "Export HubSpot contacts to Google Sheets for reporting",
+    "workflow_template_id": "hubspot_sheets_contacts"
+   }
+  ]
+ },
+ {
+  "doctype": "App Catalog",
+  "name": "slack",
+  "app_name": "slack",
+  "display_name": "Slack",
+  "app_description": "Team communication and collaboration platform",
+  "category": "Communication",
+  "logo_url": "https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png",
+  "oauth_provider": "slack",
+  "is_active": 1,
+  "use_cases": [
+   {
+    "use_case_name": "Send invoice notifications",
+    "use_case_description": "Send Slack notifications when new invoices are created in Xero",
+    "workflow_template_id": "xero_slack_notifications"
+   }
+  ]
+ }
+]

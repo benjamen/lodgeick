@@ -90,6 +90,12 @@ website_route_rules = [
 # before_install = "lodgeick.install.before_install"
 # after_install = "lodgeick.install.after_install"
 
+# Fixtures
+# --------
+fixtures = [
+	{"dt": "App Catalog", "filters": [["name", "in", ["xero", "google_sheets", "hubspot", "slack"]]]}
+]
+
 # Uninstallation
 # ------------
 
