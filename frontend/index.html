@@ -62,8 +62,25 @@
         console.log('[Frappe Shim - index.html] frappe.ui:', window.frappe.ui)
         console.log('[Frappe Shim - index.html] frappe.ui.ScriptManager:', window.frappe.ui.ScriptManager)
 
-        // Freeze the ui object to prevent modifications
-        Object.freeze(window.frappe.ui)
+        // Monitor frappe.ui for modifications using a defensive getter/setter
+        var _ui = window.frappe.ui;
+        Object.defineProperty(window.frappe, 'ui', {
+          get: function() {
+            if (!_ui || !_ui.ScriptManager) {
+              console.error('[Frappe Shim] WARNING: frappe.ui or ScriptManager is missing!', _ui)
+              console.trace('[Frappe Shim] Stack trace of access:')
+            }
+            return _ui;
+          },
+          set: function(newValue) {
+            console.warn('[Frappe Shim] WARNING: Something is trying to overwrite frappe.ui!', newValue)
+            console.trace('[Frappe Shim] Stack trace of setter:')
+            _ui = newValue;
+          },
+          configurable: false
+        });
+
+        console.log('[Frappe Shim - index.html] Protection enabled for frappe.ui')
       })()
     </script>
 
