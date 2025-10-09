@@ -66,10 +66,17 @@ role_home_page = {
 }
 
 # Website route rules
+# Frappe automatically handles /desk, /app, /api, /assets, /files
+# We only need to handle the root path - SPA handles client-side routing
 website_route_rules = [
 	{"from_route": "/", "to_route": "lodgeick"},
-	{"from_route": "/<path:app_path>", "to_route": "lodgeick"},
 ]
+
+# Override website context to handle SPA routing while preserving Frappe routes
+website_context = {
+	"favicon": "/assets/lodgeick/frontend/favicon.png",
+	"splash_image": None
+}
 
 # Generators
 # ----------

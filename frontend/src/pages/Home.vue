@@ -15,7 +15,18 @@
           <div class="hidden md:flex items-center space-x-6">
             <!-- Show when logged in -->
             <template v-if="session.isLoggedIn">
-              <span class="text-white text-sm font-medium">{{ session.user }}</span>
+              <router-link
+                to="/account/profile"
+                class="text-white text-sm font-medium hover:underline underline-offset-4 transition-all duration-200"
+              >
+                {{ session.user }}
+              </router-link>
+              <a
+                href="/desk"
+                class="text-white text-sm font-medium hover:underline underline-offset-4 transition-all duration-200"
+              >
+                Desk
+              </a>
               <button
                 @click="session.logout.submit()"
                 class="px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-200 transform hover:scale-105"
@@ -26,6 +37,12 @@
 
             <!-- Show when not logged in -->
             <template v-else>
+              <a
+                href="/desk"
+                class="text-white text-sm font-medium hover:underline underline-offset-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1"
+              >
+                Desk
+              </a>
               <router-link
                 to="/account/login"
                 class="text-white text-sm font-medium hover:underline underline-offset-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1"
@@ -70,9 +87,19 @@
           <div class="px-4 py-4 space-y-3">
             <!-- Show when logged in -->
             <template v-if="session.isLoggedIn">
-              <div class="text-white text-sm font-medium py-2 border-b border-white/10">
+              <router-link
+                to="/account/profile"
+                @click="mobileMenuOpen = false"
+                class="block text-white text-sm font-medium py-2 border-b border-white/10"
+              >
                 {{ session.user }}
-              </div>
+              </router-link>
+              <a
+                href="/desk"
+                class="block w-full text-center px-5 py-2.5 text-white text-sm font-medium border border-white/30 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200"
+              >
+                Frappe Desk
+              </a>
               <button
                 @click="session.logout.submit(); mobileMenuOpen = false"
                 class="w-full px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200"
@@ -83,6 +110,12 @@
 
             <!-- Show when not logged in -->
             <template v-else>
+              <a
+                href="/desk"
+                class="block w-full text-center px-5 py-2.5 text-white text-sm font-medium border border-white/30 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200"
+              >
+                Frappe Desk
+              </a>
               <router-link
                 to="/account/login"
                 @click="mobileMenuOpen = false"

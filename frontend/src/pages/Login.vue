@@ -11,14 +11,15 @@
             <div class="card-body p-4">
               <form @submit.prevent="submit">
                 <div class="mb-3">
-                  <label class="form-label font-weight-bold">Email Address</label>
+                  <label class="form-label font-weight-bold">Email or Username</label>
                   <input
                     name="email"
-                    type="email"
+                    type="text"
                     class="form-control"
-                    placeholder="john@example.com"
+                    placeholder="john@example.com or Administrator"
                     required
                   />
+                  <small class="text-muted">You can log in with your email address or username</small>
                 </div>
                 <div class="mb-3">
                   <label class="form-label font-weight-bold">Password</label>
@@ -41,11 +42,16 @@
                 </button>
 
                 <div class="text-center">
-                  <p class="text-muted mb-0">
+                  <p class="text-muted mb-2">
                     Don't have an account?
                     <router-link to="/account/signup" class="text-primary font-weight-bold">
                       Create Account
                     </router-link>
+                  </p>
+                  <p class="text-muted mb-0">
+                    <a href="/desk" class="text-muted text-decoration-none">
+                      <small>Administrator? Access Frappe Desk →</small>
+                    </a>
                   </p>
                 </div>
               </form>
