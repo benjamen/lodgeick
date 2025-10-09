@@ -55,6 +55,11 @@ const routes = [
 		component: () => import("@/pages/Signup.vue"),
 	},
 	{
+		name: "EmailVerification",
+		path: "/account/verify-email",
+		component: () => import("@/pages/EmailVerification.vue"),
+	},
+	{
 		name: "OAuthCallback",
 		path: "/oauth/callback",
 		component: () => import("@/pages/OAuthCallback.vue"),
@@ -114,7 +119,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 	// Public routes that don't require authentication
-	const publicRoutes = ["Home", "Pricing", "API", "Auth", "OAuthCallback", "Signup", "Login"]
+	const publicRoutes = ["Home", "Pricing", "API", "Auth", "OAuthCallback", "Signup", "Login", "EmailVerification"]
 
 	// Check if user is logged in
 	let isLoggedIn = session.isLoggedIn

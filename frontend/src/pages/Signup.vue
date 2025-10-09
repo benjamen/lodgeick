@@ -57,12 +57,18 @@
                 </button>
 
                 <div class="text-center">
-                  <p class="text-muted mb-0">
+                  <p class="text-muted mb-2">
                     Already have an account?
                     <router-link to="/account/login" class="text-primary font-weight-bold">
                       Sign In
                     </router-link>
                   </p>
+                  <router-link to="/" class="text-muted small no-underline">
+                    <svg class="back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Home
+                  </router-link>
                 </div>
               </form>
             </div>
@@ -101,8 +107,11 @@ const signupResource = createResource({
   onSuccess(data) {
     loading.value = false
     if (data.message === "Please check your email for verification") {
-      alert("Account created successfully! Please check your email to verify your account.")
-      router.push("/account/login")
+      // Redirect to email verification page
+      router.push({
+        name: 'EmailVerification',
+        query: { email: formData.value.email }
+      })
     } else {
       // Auto-login successful
       router.push("/")
@@ -172,5 +181,21 @@ function handleSignup() {
 
 .font-weight-bold {
   font-weight: 700;
+}
+
+.back-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-right: 0.25rem;
+  vertical-align: middle;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.no-underline:hover {
+  text-decoration: underline !important;
 }
 </style>
