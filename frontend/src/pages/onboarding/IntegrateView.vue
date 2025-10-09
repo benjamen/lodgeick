@@ -1,13 +1,37 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <!-- Header with Logo -->
+    <!-- Header with Logo and Account Menu -->
     <div class="p-6">
-      <router-link to="/" class="inline-flex items-center gap-3 group no-underline">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-          <span class="text-white font-bold text-xl">L</span>
+      <div class="flex items-center justify-between">
+        <router-link to="/" class="inline-flex items-center gap-3 group no-underline">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-xl">L</span>
+          </div>
+          <span class="text-2xl font-bold text-gray-900">Lodgeick</span>
+        </router-link>
+
+        <!-- User Menu -->
+        <div class="flex items-center gap-4">
+          <router-link
+            to="/account/profile"
+            class="text-gray-700 hover:text-blue-600 font-medium transition-colors no-underline flex items-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            My Account
+          </router-link>
+          <button
+            @click="handleLogout"
+            class="text-gray-700 hover:text-red-600 font-medium transition-colors flex items-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Log Out
+          </button>
         </div>
-        <span class="text-2xl font-bold text-gray-900">Lodgeick</span>
-      </router-link>
+      </div>
     </div>
 
     <!-- Main Content -->
@@ -214,6 +238,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { session } from '@/data/session'
 import { useOnboardingStore } from '@/stores/onboarding'
 import StepProgressBar from '@/components/onboarding/StepProgressBar.vue'
 import PrimaryButton from '@/components/onboarding/PrimaryButton.vue'
@@ -221,6 +246,10 @@ import SecondaryButton from '@/components/onboarding/SecondaryButton.vue'
 
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
+
+const handleLogout = () => {
+  session.logout.submit()
+}
 
 const isIntegrating = ref(false)
 const integrationComplete = ref(false)
