@@ -26,7 +26,8 @@ export const session = reactive({
 			userResource.reload()
 			session.user = sessionUser()
 			session.login.reset()
-			router.replace(data.default_route || "/")
+			// Always redirect to Vue SPA home page, not Frappe's default_route (/app or /desk)
+			router.replace("/")
 		},
 	}),
 	logout: createResource({

@@ -56,18 +56,19 @@ app_license = "mit"
 # Home Pages
 # ----------
 
-# application home page (will override Website Settings)
-home_page = "lodgeick"
+# Don't set home_page - it overrides ALL routes including /desk and /app
+# Instead, use website_route_rules to map only root to Vue SPA
+# home_page = "lodgeick"
 
-# website user home page (by Role)
-role_home_page = {
-	"Guest": "lodgeick",
-	"System Manager": "lodgeick"
-}
+# Let Frappe handle its own routes for desk and app
+# Don't override role_home_page - this allows /desk and /app to work normally
+# role_home_page = {
+# 	"Guest": "lodgeick",
+# }
 
 # Website route rules
+# IMPORTANT: Only route the root path to Vue SPA
 # Frappe automatically handles /desk, /app, /api, /assets, /files
-# We only need to handle the root path - SPA handles client-side routing
 website_route_rules = [
 	{"from_route": "/", "to_route": "lodgeick"},
 ]

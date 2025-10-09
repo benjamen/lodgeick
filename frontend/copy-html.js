@@ -18,15 +18,57 @@ html = html.replace(/\/assets\//g, '/assets/lodgeick/frontend/assets/');
 // Fix favicon path
 html = html.replace('href="/favicon.png"', 'href="/assets/lodgeick/frontend/favicon.png"');
 
-// Add Frappe boot script before </body>
-const bootScript = `
-          <script>
-              {% for key in boot %}
-              window["{{ key }}"] = {{ boot[key] | tojson }};
-              {% endfor %}
-          </script>`;
+// Extract all module scripts from anywhere in the HTML
+const moduleScriptRegex = /<script\s+type="module"[^>]*>[\s\S]*?<\/script>|<script\s+type="module"[^>]*\/>/g;
+const moduleScripts = html.match(moduleScriptRegex) || [];
 
-html = html.replace('</body>', `${bootScript}\n          </body>`);
+// Remove module scripts from their current positions
+html = html.replace(moduleScriptRegex, '');
+
+// Prepare minimal frappe initialization + boot script
+// This provides just enough for frappe-ui without breaking /desk and /app routes
+const initScript = `
+    <script>
+      // Initialize minimal frappe object to prevent ReferenceErrors
+      // This allows the Vue SPA to work while /desk and /app get the real Frappe framework
+      if (!window.frappe) {
+        window.frappe = {
+          session: { user: '{{ user if user else "Guest" }}' },
+          csrf_token: '{{ csrf_token if csrf_token else "" }}',
+          boot: {
+            lang: 'en',
+            sysdefaults: {},
+            user: '{{ user if user else "Guest" }}',
+            user_roles: []
+          },
+          form: {},
+          ui: {
+            ScriptManager: function() {
+              this.load = function() { return Promise.resolve() }
+              this.loaded = {}
+            }
+          },
+          call: function() { return Promise.resolve({ message: {} }) },
+          xcall: function() { return Promise.resolve() },
+        };
+      }
+
+      // Set additional globals
+      window.site_name = '{{ site_name if site_name else "localhost" }}';
+      window.csrf_token = '{{ csrf_token if csrf_token else "" }}';
+      window.cur_frm = null;
+
+      // Frappe boot data
+      {% for key in boot %}
+      window["{{ key }}"] = {{ boot[key] | tojson }};
+      {% endfor %}
+    </script>
+
+    <!-- Vue app module loads after frappe globals are set -->`;
+
+// Inject initialization script and module scripts before </body>
+const scriptsToInject = initScript + '\n    ' + moduleScripts.join('\n    ');
+html = html.replace('</body>', `${scriptsToInject}\n  </body>`);
 
 // Write to www/lodgeick.html
 fs.writeFileSync(targetPath, html);

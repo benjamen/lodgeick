@@ -34,12 +34,23 @@ export default defineConfig({
 	},
 	server: {
 		host: '0.0.0.0',
+		port: 5173,
+		// Prevent Vite from clearing screen on restart
+		clearScreen: false,
+		// Allow serving files from Frappe's public directory
+		fs: {
+			strict: false,
+		},
 		proxy: {
 			// Proxy backend routes to Frappe
+			// IMPORTANT: Don't use Vite dev server for /desk or /app routes
+			// Access them directly at http://localhost:8090/desk instead
 			"^/(app|api|assets|files|desk)": {
 				target: "http://127.0.0.1:8090",
 				ws: true,
 				changeOrigin: true,
+				// Don't rewrite path - keep as-is
+				rewrite: (path) => path,
 			},
 		},
 	},

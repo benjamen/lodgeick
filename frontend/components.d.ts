@@ -10,10 +10,16 @@ declare module 'vue' {
   export interface GlobalComponents {
     AccountCard: typeof import('./src/components/AccountCard.vue')['default']
     AccountSidebar: typeof import('./src/components/AccountSidebar.vue')['default']
+    AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    CallToAction: typeof import('./src/components/CallToAction.vue')['default']
     ConfirmModal: typeof import('./src/components/ConfirmModal.vue')['default']
+    FeatureGrid: typeof import('./src/components/FeatureGrid.vue')['default']
+    HeroSection: typeof import('./src/components/HeroSection.vue')['default']
     IntegrationItem: typeof import('./src/components/IntegrationItem.vue')['default']
+    IntegrationsGrid: typeof import('./src/components/IntegrationsGrid.vue')['default']
     OAuthSetupWizard: typeof import('./src/components/OAuthSetupWizard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StepsSection: typeof import('./src/components/StepsSection.vue')['default']
   }
 }

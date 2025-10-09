@@ -6,16 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lodgeick - One-Click Integrations</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script type="module" crossorigin src="/assets/lodgeick/frontend/assets/index-DQvb6_wj.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/lodgeick/frontend/assets/index-B7d9jj-r.css">
+    <link rel="stylesheet" crossorigin href="/assets/lodgeick/frontend/assets/index-D3IG4cV7.css">
   </head>
   <body>
     <div id="app"></div>
   
-          <script>
-              {% for key in boot %}
-              window["{{ key }}"] = {{ boot[key] | tojson }};
-              {% endfor %}
-          </script>
-          </body>
+    <script>
+      // Initialize minimal frappe object to prevent ReferenceErrors
+      // This allows the Vue SPA to work while /desk and /app get the real Frappe framework
+      if (!window.frappe) {
+        window.frappe = {
+          session: { user: '{{ user if user else "Guest" }}' },
+          csrf_token: '{{ csrf_token if csrf_token else "" }}',
+          boot: {
+            lang: 'en',
+            sysdefaults: {},
+            user: '{{ user if user else "Guest" }}',
+            user_roles: []
+          },
+          form: {},
+          ui: {
+            ScriptManager: function() {
+              this.load = function() { return Promise.resolve() }
+              this.loaded = {}
+            }
+          },
+          call: function() { return Promise.resolve({ message: {} }) },
+          xcall: function() { return Promise.resolve() },
+        };
+      }
+
+      // Set additional globals
+      window.site_name = '{{ site_name if site_name else "localhost" }}';
+      window.csrf_token = '{{ csrf_token if csrf_token else "" }}';
+      window.cur_frm = null;
+
+      // Frappe boot data
+      {% for key in boot %}
+      window["{{ key }}"] = {{ boot[key] | tojson }};
+      {% endfor %}
+    </script>
+
+    <!-- Vue app module loads after frappe globals are set -->
+    <script type="module" crossorigin src="/assets/lodgeick/frontend/assets/index-3OJkRj5t.js"></script>
+  </body>
 </html>
