@@ -42,10 +42,13 @@
         <div class="flex justify-between items-center">
           <div>
             <h1 class="text-3xl font-bold mb-2">
-              Welcome to Lodgeick! 🎉
+              Welcome back, {{ userName }}! 👋
             </h1>
             <p class="text-blue-100 text-lg">
-              Your integrations are up and running. Start automating your workflow today.
+              {{ connectedAppsCount > 0
+                ? `You have ${connectedAppsCount} app${connectedAppsCount > 1 ? 's' : ''} connected and ${activeIntegrationsCount} integration${activeIntegrationsCount !== 1 ? 's' : ''} running.`
+                : 'Get started by connecting your first app below.'
+              }}
             </p>
           </div>
           <div class="hidden md:block">
@@ -56,13 +59,17 @@
         </div>
       </div>
 
-      <!-- Stats Grid -->
+      <!-- Stats Grid - Now clickable -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-sm p-6">
+        <router-link
+          to="/account/integrations"
+          class="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all cursor-pointer no-underline"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600 mb-1">Connected Apps</p>
               <p class="text-3xl font-bold text-gray-900">{{ connectedAppsCount }}</p>
+              <p class="text-xs text-blue-600 mt-2 font-medium">View all apps →</p>
             </div>
             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,13 +77,17 @@
               </svg>
             </div>
           </div>
-        </div>
+        </router-link>
 
-        <div class="bg-white rounded-xl shadow-sm p-6">
+        <router-link
+          to="/configure"
+          class="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all cursor-pointer no-underline"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600 mb-1">Active Integrations</p>
               <p class="text-3xl font-bold text-gray-900">{{ activeIntegrationsCount }}</p>
+              <p class="text-xs text-green-600 mt-2 font-medium">Configure fields →</p>
             </div>
             <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
               <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,13 +95,14 @@
               </svg>
             </div>
           </div>
-        </div>
+        </router-link>
 
         <div class="bg-white rounded-xl shadow-sm p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600 mb-1">Data Synced</p>
-              <p class="text-3xl font-bold text-gray-900">1,234</p>
+              <p class="text-sm font-medium text-gray-600 mb-1">Data Synced Today</p>
+              <p class="text-3xl font-bold text-gray-900">{{ dataSyncedCount }}</p>
+              <p class="text-xs text-gray-500 mt-2">Last sync: {{ lastSyncTime }}</p>
             </div>
             <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
               <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,64 +117,146 @@
       <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button
-            class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
-            @click="$router.push('/connect')"
+          <!-- Connect Apps -->
+          <router-link
+            to="/connect"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-left group no-underline"
           >
             <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
-            <div class="font-semibold text-gray-900 mb-1">Add Integration</div>
-            <div class="text-sm text-gray-600">Connect more apps</div>
-          </button>
+            <div class="font-semibold text-gray-900 mb-1">Connect Apps</div>
+            <div class="text-sm text-gray-600">Add new integrations</div>
+          </router-link>
 
-          <button
-            class="p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all text-left group"
+          <!-- Manage OAuth -->
+          <router-link
+            to="/integrate"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all text-left group no-underline"
           >
             <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
             </div>
-            <div class="font-semibold text-gray-900 mb-1">View Activity</div>
-            <div class="text-sm text-gray-600">Check sync logs</div>
-          </button>
+            <div class="font-semibold text-gray-900 mb-1">OAuth Setup</div>
+            <div class="text-sm text-gray-600">Configure credentials</div>
+          </router-link>
 
-          <button
-            class="p-4 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all text-left group"
-            @click="$router.push('/account/settings')"
+          <!-- Configure Fields -->
+          <router-link
+            to="/configure"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all text-left group no-underline"
           >
             <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+            </div>
+            <div class="font-semibold text-gray-900 mb-1">Field Mapping</div>
+            <div class="text-sm text-gray-600">Map data fields</div>
+          </router-link>
+
+          <!-- Account Settings -->
+          <router-link
+            to="/account/settings"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left group no-underline"
+          >
+            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
             <div class="font-semibold text-gray-900 mb-1">Settings</div>
-            <div class="text-sm text-gray-600">Manage preferences</div>
-          </button>
+            <div class="text-sm text-gray-600">Account preferences</div>
+          </router-link>
 
-          <button
-            class="p-4 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all text-left group"
+          <!-- View Integrations -->
+          <router-link
+            to="/account/integrations"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group no-underline"
           >
-            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+            </div>
+            <div class="font-semibold text-gray-900 mb-1">View Integrations</div>
+            <div class="text-sm text-gray-600">Manage connections</div>
+          </router-link>
+
+          <!-- Security -->
+          <router-link
+            to="/account/security"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-all text-left group no-underline"
+          >
+            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div class="font-semibold text-gray-900 mb-1">Security</div>
+            <div class="text-sm text-gray-600">Passwords & auth</div>
+          </router-link>
+
+          <!-- Subscription -->
+          <router-link
+            to="/account/subscription"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-teal-500 hover:bg-teal-50 transition-all text-left group no-underline"
+          >
+            <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+            </div>
+            <div class="font-semibold text-gray-900 mb-1">Subscription</div>
+            <div class="text-sm text-gray-600">Billing & plans</div>
+          </router-link>
+
+          <!-- Documentation -->
+          <a
+            href="https://docs.lodgeick.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="p-4 border-2 border-gray-200 rounded-lg hover:border-gray-500 hover:bg-gray-50 transition-all text-left group no-underline"
+          >
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
             <div class="font-semibold text-gray-900 mb-1">Documentation</div>
-            <div class="text-sm text-gray-600">Learn more</div>
-          </button>
+            <div class="text-sm text-gray-600 flex items-center gap-1">
+              Learn more
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </div>
+          </a>
         </div>
       </div>
 
       <!-- Recent Activity -->
       <div class="bg-white rounded-xl shadow-sm p-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-gray-900">Recent Activity</h2>
+          <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            View all →
+          </button>
+        </div>
         <div class="space-y-4">
-          <div class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+          <div v-if="connectedAppsCount === 0" class="text-center py-8 text-gray-500">
+            <svg class="w-16 h-16 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p class="text-sm">No activity yet</p>
+            <p class="text-xs mt-1">Connect an app to get started</p>
+          </div>
+
+          <div v-else class="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
             <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -202,6 +296,29 @@ const onboardingStore = useOnboardingStore()
 
 const connectedAppsCount = computed(() => onboardingStore.connectedApps.length)
 const activeIntegrationsCount = computed(() => onboardingStore.selectedIntegrations.length)
+
+// Simulated data - replace with real API calls
+const dataSyncedCount = computed(() => {
+  return connectedAppsCount.value > 0 ? Math.floor(Math.random() * 500) + 100 : 0
+})
+
+const lastSyncTime = computed(() => {
+  if (connectedAppsCount.value === 0) return 'Never'
+  return '2 minutes ago'
+})
+
+const userName = computed(() => {
+  const user = session.user
+  if (!user || user === 'Guest') return 'User'
+
+  // Extract first name from email or full name
+  if (user.includes('@')) {
+    return user.split('@')[0].charAt(0).toUpperCase() + user.split('@')[0].slice(1)
+  }
+
+  const parts = user.split(' ')
+  return parts[0]
+})
 
 const userInitials = computed(() => {
   const user = session.user
