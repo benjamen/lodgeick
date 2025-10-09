@@ -1,47 +1,104 @@
 <template>
   <div class="landing-page">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark position-absolute w-100 z-index-3">
-      <div class="container">
-        <a class="navbar-brand" href="#">
-          <span class="text-white font-weight-bold">Lodgeick</span>
-        </a>
-        <button
-          class="navbar-toggler shadow-none ms-2"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navigation">
-          <ul class="navbar-nav ms-auto">
+    <nav class="absolute top-0 left-0 right-0 z-50 w-full">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+          <!-- Logo -->
+          <div class="flex-shrink-0">
+            <a href="#" class="text-white text-2xl font-bold tracking-tight hover:opacity-90 transition-opacity duration-200">
+              Lodgeick
+            </a>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center space-x-6">
             <!-- Show when logged in -->
             <template v-if="session.isLoggedIn">
-              <li class="nav-item">
-                <a class="nav-link text-white">{{ session.user }}</a>
-              </li>
-              <li class="nav-item">
-                <button @click="session.logout.submit()" class="btn btn-sm btn-white mb-0">
-                  Logout
-                </button>
-              </li>
+              <span class="text-white text-sm font-medium">{{ session.user }}</span>
+              <button
+                @click="session.logout.submit()"
+                class="px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-200 transform hover:scale-105"
+              >
+                Logout
+              </button>
             </template>
 
             <!-- Show when not logged in -->
             <template v-else>
-              <li class="nav-item">
-                <router-link to="/account/login" class="nav-link text-white">
-                  Sign In
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/account/signup" class="btn btn-sm btn-white mb-0">
-                  Create Account
-                </router-link>
-              </li>
+              <router-link
+                to="/account/login"
+                class="text-white text-sm font-medium hover:underline underline-offset-4 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent rounded px-2 py-1"
+              >
+                Log In
+              </router-link>
+              <router-link
+                to="/account/signup"
+                class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-200 transform hover:scale-105"
+              >
+                Create Account
+              </router-link>
             </template>
-          </ul>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              @click="mobileMenuOpen = !mobileMenuOpen"
+              type="button"
+              class="inline-flex items-center justify-center p-2 rounded-lg text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white transition-colors duration-200"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Open main menu</span>
+              <!-- Hamburger icon -->
+              <svg v-if="!mobileMenuOpen" class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+              <!-- Close icon -->
+              <svg v-else class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div
+          v-show="mobileMenuOpen"
+          class="md:hidden bg-gray-900/95 backdrop-blur-sm rounded-lg mt-2 shadow-xl border border-white/10 transition-all duration-300 ease-in-out"
+        >
+          <div class="px-4 py-4 space-y-3">
+            <!-- Show when logged in -->
+            <template v-if="session.isLoggedIn">
+              <div class="text-white text-sm font-medium py-2 border-b border-white/10">
+                {{ session.user }}
+              </div>
+              <button
+                @click="session.logout.submit(); mobileMenuOpen = false"
+                class="w-full px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-lg shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200"
+              >
+                Logout
+              </button>
+            </template>
+
+            <!-- Show when not logged in -->
+            <template v-else>
+              <router-link
+                to="/account/login"
+                @click="mobileMenuOpen = false"
+                class="block w-full text-center px-5 py-2.5 text-white text-sm font-medium border border-white/30 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200"
+              >
+                Log In
+              </router-link>
+              <router-link
+                to="/account/signup"
+                @click="mobileMenuOpen = false"
+                class="block w-full text-center px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
+              >
+                Create Account
+              </router-link>
+            </template>
+          </div>
         </div>
       </div>
     </nav>
@@ -407,6 +464,7 @@ const selectedApp = ref(null)
 const selectedCategory = ref(null)
 const showSetupWizard = ref(false)
 const showAuthModal = ref(false)
+const mobileMenuOpen = ref(false)
 
 // Fetch app catalog
 const catalog = createResource({
@@ -725,21 +783,6 @@ function activateUseCase(useCase) {
 
 .font-weight-bold {
   font-weight: 700;
-}
-
-.navbar-dark .navbar-brand {
-  color: #fff;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.btn-white {
-  background-color: white;
-  color: #344767;
-}
-
-.btn-white:hover {
-  background-color: #f8f9fa;
 }
 
 @media (max-width: 768px) {

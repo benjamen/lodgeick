@@ -9,8 +9,8 @@ import random
 from playwright.sync_api import sync_playwright, expect
 
 # Test configuration
-BASE_URL = "http://localhost:8006"  # Dev server
-# BASE_URL = "http://lodgeick.com:8000/frontend"  # Production
+BASE_URL = "http://home.localhost:8080"  # Frontend URL (per user instructions)
+# BASE_URL = "http://localhost:8006"  # Alternative dev server
 TEST_EMAIL = f"test{random.randint(1000, 9999)}@lodgeick.com"
 TEST_PASSWORD = "Test123!@#"
 TEST_NAME = "Test User"
