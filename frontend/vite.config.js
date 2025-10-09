@@ -5,7 +5,9 @@ import { defineConfig } from "vite"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	base: process.env.NODE_ENV === 'production' ? "/assets/lodgeick/frontend/" : "/",
+	// Base path: "/" for both dev and production
+	// Assets are served from /assets/lodgeick/frontend/ by Frappe
+	base: "/",
 	plugins: [
 		frappeui({
 			lucideIcons: true,
@@ -18,6 +20,8 @@ export default defineConfig({
 		emptyOutDir: true,
 		target: "es2015",
 		sourcemap: true,
+		// Ensure assets use absolute paths from the /assets/ directory
+		assetsDir: "assets",
 	},
 	resolve: {
 		alias: {
@@ -31,7 +35,8 @@ export default defineConfig({
 	server: {
 		host: '0.0.0.0',
 		proxy: {
-			"^/(app|api|assets|files)": {
+			// Proxy backend routes to Frappe
+			"^/(app|api|assets|files|desk)": {
 				target: "http://127.0.0.1:8090",
 				ws: true,
 				changeOrigin: true,

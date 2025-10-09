@@ -11,6 +11,13 @@ const targetPath = path.join(__dirname, '..', 'lodgeick', 'www', 'lodgeick.html'
 
 let html = fs.readFileSync(builtIndexPath, 'utf-8');
 
+// Fix asset paths to use Frappe's asset serving structure
+// Replace /assets/ with /assets/lodgeick/frontend/assets/
+html = html.replace(/\/assets\//g, '/assets/lodgeick/frontend/assets/');
+
+// Fix favicon path
+html = html.replace('href="/favicon.png"', 'href="/assets/lodgeick/frontend/favicon.png"');
+
 // Add Frappe boot script before </body>
 const bootScript = `
           <script>

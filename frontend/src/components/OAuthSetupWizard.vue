@@ -408,7 +408,7 @@ const providerName = computed(() => {
 })
 
 const redirectUri = computed(() => {
-  return window.location.origin + '/frontend/oauth/callback'
+  return window.location.origin + '/oauth/callback'
 })
 
 const steps = [

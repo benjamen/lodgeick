@@ -95,7 +95,7 @@ const signupResource = createResource({
     return {
       email: values.email,
       full_name: values.fullName,
-      redirect_to: "/frontend"
+      redirect_to: "/"
     }
   },
   onSuccess(data) {
