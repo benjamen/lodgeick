@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { call } from 'frappe-ui'
 
 export const useOnboardingStore = defineStore('onboarding', () => {
   // State
@@ -9,58 +10,10 @@ export const useOnboardingStore = defineStore('onboarding', () => {
   const connectedApps = ref([])
   const selectedIntegrations = ref([])
   const fieldMappings = ref({})
+  const isLoadingApps = ref(false)
 
-  // Available apps for integration
-  const availableApps = ref([
-    {
-      id: 'jira',
-      name: 'Jira',
-      description: 'Project management and issue tracking',
-      icon: '🎯',
-      color: 'bg-blue-500',
-      isConnected: false,
-    },
-    {
-      id: 'slack',
-      name: 'Slack',
-      description: 'Team communication and collaboration',
-      icon: '💬',
-      color: 'bg-purple-500',
-      isConnected: false,
-    },
-    {
-      id: 'hubspot',
-      name: 'HubSpot',
-      description: 'CRM and marketing automation',
-      icon: '🎨',
-      color: 'bg-orange-500',
-      isConnected: false,
-    },
-    {
-      id: 'google_sheets',
-      name: 'Google Sheets',
-      description: 'Spreadsheets and data management',
-      icon: '📊',
-      color: 'bg-green-500',
-      isConnected: false,
-    },
-    {
-      id: 'salesforce',
-      name: 'Salesforce',
-      description: 'Customer relationship management',
-      icon: '☁️',
-      color: 'bg-blue-600',
-      isConnected: false,
-    },
-    {
-      id: 'mailchimp',
-      name: 'Mailchimp',
-      description: 'Email marketing platform',
-      icon: '✉️',
-      color: 'bg-yellow-500',
-      isConnected: false,
-    },
-  ])
+  // Available apps for integration (loaded from backend)
+  const availableApps = ref([])
 
   // Computed
   const progress = computed(() => (currentStep.value / totalSteps.value) * 100)
@@ -82,6 +35,59 @@ export const useOnboardingStore = defineStore('onboarding', () => {
   const hasConnectedApps = computed(() => connectedApps.value.length > 0)
 
   // Actions
+  async function loadApps() {
+    if (availableApps.value.length > 0) return // Already loaded
+
+    isLoadingApps.value = true
+    try {
+      const response = await call('lodgeick.api.catalog.get_app_catalog')
+
+      if (response.success && response.apps) {
+        availableApps.value = response.apps.map(app => ({
+          id: app.app_name,
+          name: app.display_name || app.app_name,
+          description: app.description,
+          icon: getAppIcon(app.app_name),
+          color: getAppColor(app.category),
+          logo_url: app.logo_url,
+          category: app.category,
+          oauth_provider: app.oauth_provider,
+          isConnected: false,
+          use_cases: app.use_cases || []
+        }))
+      }
+    } catch (error) {
+      console.error('Failed to load apps:', error)
+    } finally {
+      isLoadingApps.value = false
+    }
+  }
+
+  function getAppIcon(appName) {
+    const icons = {
+      'jira': '🎯',
+      'slack': '💬',
+      'hubspot': '🎨',
+      'google_sheets': '📊',
+      'salesforce': '☁️',
+      'mailchimp': '✉️',
+      'xero': '💼',
+    }
+    return icons[appName] || '🔌'
+  }
+
+  function getAppColor(category) {
+    const colors = {
+      'CRM': 'bg-orange-500',
+      'Communication': 'bg-purple-500',
+      'Productivity': 'bg-green-500',
+      'Finance': 'bg-blue-600',
+      'Marketing': 'bg-yellow-500',
+      'Project Management': 'bg-blue-500',
+    }
+    return colors[category] || 'bg-gray-500'
+  }
+
   function setStep(step) {
     currentStep.value = step
   }
@@ -160,6 +166,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     selectedIntegrations,
     fieldMappings,
     availableApps,
+    isLoadingApps,
 
     // Computed
     progress,
@@ -167,6 +174,7 @@ export const useOnboardingStore = defineStore('onboarding', () => {
     hasConnectedApps,
 
     // Actions
+    loadApps,
     setStep,
     nextStep,
     previousStep,

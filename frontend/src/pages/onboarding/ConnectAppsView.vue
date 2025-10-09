@@ -44,8 +44,18 @@
         </div>
       </div>
 
+      <!-- Loading State -->
+      <div v-if="onboardingStore.isLoadingApps" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div v-for="i in 6" :key="i" class="bg-white rounded-xl border-2 border-gray-200 p-6 animate-pulse">
+          <div class="w-16 h-16 bg-gray-200 rounded-xl mb-4"></div>
+          <div class="h-6 bg-gray-200 rounded mb-2"></div>
+          <div class="h-4 bg-gray-200 rounded mb-4"></div>
+          <div class="h-10 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+
       <!-- Integration Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <IntegrationCard
           v-for="app in onboardingStore.availableApps"
           :key="app.id"
@@ -100,6 +110,7 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useOnboardingStore } from '@/stores/onboarding'
 import StepProgressBar from '@/components/onboarding/StepProgressBar.vue'
@@ -109,6 +120,11 @@ import SecondaryButton from '@/components/onboarding/SecondaryButton.vue'
 
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
+
+// Load apps from backend on mount
+onMounted(async () => {
+  await onboardingStore.loadApps()
+})
 
 const handleConnect = (appId) => {
   onboardingStore.connectApp(appId)
