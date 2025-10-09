@@ -8,6 +8,16 @@ const routes = [
 		name: "Home",
 		component: () => import("@/pages/Home.vue"),
 	},
+	{
+		path: "/pricing",
+		name: "Pricing",
+		component: () => import("@/pages/Pricing.vue"),
+	},
+	{
+		path: "/api",
+		name: "API",
+		component: () => import("@/pages/APIDocumentation.vue"),
+	},
 	// New Onboarding Flow
 	{
 		name: "Auth",
@@ -104,7 +114,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 	// Public routes that don't require authentication
-	const publicRoutes = ["Home", "Auth", "OAuthCallback", "Signup", "Login"]
+	const publicRoutes = ["Home", "Pricing", "API", "Auth", "OAuthCallback", "Signup", "Login"]
 
 	// Check if user is logged in
 	let isLoggedIn = session.isLoggedIn
