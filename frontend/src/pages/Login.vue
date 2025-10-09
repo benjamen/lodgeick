@@ -32,6 +32,10 @@
                   />
                 </div>
 
+                <div v-if="error" class="alert alert-danger mb-3">
+                  {{ error }}
+                </div>
+
                 <button
                   type="submit"
                   class="btn btn-primary w-100 mb-3"
@@ -70,14 +74,28 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from "vue"
 import { session } from "../data/session"
 
-function submit(e) {
+const error = ref("")
+
+async function submit(e) {
+	error.value = ""
 	const formData = new FormData(e.target)
-	session.login.submit({
-		email: formData.get("email"),
-		password: formData.get("password"),
-	})
+
+	try {
+		await session.login.submit({
+			email: formData.get("email"),
+			password: formData.get("password"),
+		})
+	} catch (err) {
+		// Handle authentication errors
+		if (err.message && err.message.includes('AuthenticationError')) {
+			error.value = "Invalid username/email or password"
+		} else {
+			error.value = err.message || "Login failed. Please try again."
+		}
+	}
 }
 </script>
 
