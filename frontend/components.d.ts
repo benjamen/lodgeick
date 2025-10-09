@@ -8,6 +8,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AccountCard: typeof import('./src/components/AccountCard.vue')['default']
+    AccountSidebar: typeof import('./src/components/AccountSidebar.vue')['default']
+    ConfirmModal: typeof import('./src/components/ConfirmModal.vue')['default']
+    IntegrationItem: typeof import('./src/components/IntegrationItem.vue')['default']
     OAuthSetupWizard: typeof import('./src/components/OAuthSetupWizard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
