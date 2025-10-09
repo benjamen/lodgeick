@@ -1,0 +1,137 @@
+<template>
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Header with Logo -->
+    <div class="p-6">
+      <router-link to="/" class="inline-flex items-center gap-3 group no-underline">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <span class="text-white font-bold text-xl">L</span>
+        </div>
+        <span class="text-2xl font-bold text-gray-900">Lodgeick</span>
+      </router-link>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      <!-- Progress Bar -->
+      <StepProgressBar :current-step="onboardingStore.currentStep" :total-steps="4" />
+
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          Connect Your Apps
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Select the applications you want to integrate. You can connect more apps later.
+        </p>
+      </div>
+
+      <!-- Connected Apps Summary -->
+      <div v-if="onboardingStore.hasConnectedApps" class="mb-8">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span class="text-blue-800 font-medium">
+              {{ onboardingStore.connectedApps.length }}
+              {{ onboardingStore.connectedApps.length === 1 ? 'app' : 'apps' }} connected
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Integration Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <IntegrationCard
+          v-for="app in onboardingStore.availableApps"
+          :key="app.id"
+          :app="app"
+          :is-connected="app.isConnected"
+          @connect="handleConnect"
+          @disconnect="handleDisconnect"
+        />
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-between items-center max-w-2xl mx-auto">
+        <SecondaryButton
+          label="Back"
+          @click="goBack"
+        >
+          <template #icon>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </template>
+        </SecondaryButton>
+
+        <div class="flex gap-3">
+          <SecondaryButton
+            label="Skip"
+            @click="skipStep"
+          />
+
+          <PrimaryButton
+            :disabled="!onboardingStore.canContinue"
+            label="Continue"
+            @click="nextStep"
+          >
+            <template #iconRight>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </template>
+          </PrimaryButton>
+        </div>
+      </div>
+
+      <!-- Help Text -->
+      <div v-if="!onboardingStore.hasConnectedApps" class="text-center mt-8">
+        <p class="text-sm text-gray-500">
+          💡 Tip: Connect at least one app to continue to the next step
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useRouter } from 'vue-router'
+import { useOnboardingStore } from '@/stores/onboarding'
+import StepProgressBar from '@/components/onboarding/StepProgressBar.vue'
+import IntegrationCard from '@/components/onboarding/IntegrationCard.vue'
+import PrimaryButton from '@/components/onboarding/PrimaryButton.vue'
+import SecondaryButton from '@/components/onboarding/SecondaryButton.vue'
+
+const router = useRouter()
+const onboardingStore = useOnboardingStore()
+
+const handleConnect = (appId) => {
+  onboardingStore.connectApp(appId)
+}
+
+const handleDisconnect = (appId) => {
+  onboardingStore.disconnectApp(appId)
+}
+
+const nextStep = () => {
+  if (onboardingStore.canContinue) {
+    onboardingStore.nextStep()
+    router.push({ name: 'Integrate' })
+  }
+}
+
+const skipStep = () => {
+  onboardingStore.nextStep()
+  router.push({ name: 'Integrate' })
+}
+
+const goBack = () => {
+  onboardingStore.previousStep()
+  router.push({ name: 'Auth' })
+}
+</script>

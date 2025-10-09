@@ -140,8 +140,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { session } from '../data/session'
+import { useOnboardingStore } from '@/stores/onboarding'
 import HeroSection from '../components/HeroSection.vue'
 import FeatureGrid from '../components/FeatureGrid.vue'
 import StepsSection from '../components/StepsSection.vue'
@@ -149,5 +151,20 @@ import IntegrationsGrid from '../components/IntegrationsGrid.vue'
 import CallToAction from '../components/CallToAction.vue'
 import AppFooter from '../components/AppFooter.vue'
 
+const router = useRouter()
+const onboardingStore = useOnboardingStore()
+
 const mobileMenuOpen = ref(false)
+const isLoggedIn = computed(() => session.isLoggedIn)
+
+// Redirect logged-in users to dashboard or onboarding
+onMounted(() => {
+  if (isLoggedIn.value) {
+    if (onboardingStore.isCompleted || onboardingStore.connectedApps.length > 0) {
+      router.push('/dashboard')
+    } else {
+      router.push('/connect')
+    }
+  }
+})
 </script>

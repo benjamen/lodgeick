@@ -8,6 +8,32 @@ const routes = [
 		name: "Home",
 		component: () => import("@/pages/Home.vue"),
 	},
+	// New Onboarding Flow
+	{
+		name: "Auth",
+		path: "/auth",
+		component: () => import("@/pages/onboarding/AuthView.vue"),
+		meta: { isOnboarding: true },
+	},
+	{
+		name: "ConnectApps",
+		path: "/connect",
+		component: () => import("@/pages/onboarding/ConnectAppsView.vue"),
+		meta: { requiresAuth: true, isOnboarding: true, step: 2 },
+	},
+	{
+		name: "Integrate",
+		path: "/integrate",
+		component: () => import("@/pages/onboarding/IntegrateView.vue"),
+		meta: { requiresAuth: true, isOnboarding: true, step: 3 },
+	},
+	{
+		name: "Configure",
+		path: "/configure",
+		component: () => import("@/pages/onboarding/ConfigureFieldsView.vue"),
+		meta: { requiresAuth: true, isOnboarding: true, step: 4 },
+	},
+	// Legacy Auth Routes (kept for compatibility)
 	{
 		name: "Login",
 		path: "/account/login",
@@ -23,6 +49,14 @@ const routes = [
 		path: "/oauth/callback",
 		component: () => import("@/pages/OAuthCallback.vue"),
 	},
+	// Dashboard (post-onboarding)
+	{
+		name: "Dashboard",
+		path: "/dashboard",
+		component: () => import("@/pages/Dashboard.vue"),
+		meta: { requiresAuth: true },
+	},
+	// Account Management
 	{
 		path: "/account",
 		component: () => import("@/layouts/AccountLayout.vue"),
@@ -70,18 +104,13 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 	// Public routes that don't require authentication
-	const publicRoutes = ["Home", "OAuthCallback", "Signup", "Login"]
-
-	// Allow public routes without authentication
-	if (publicRoutes.includes(to.name)) {
-		next()
-		return
-	}
+	const publicRoutes = ["Home", "Auth", "OAuthCallback", "Signup", "Login"]
 
 	// Check if user is logged in
 	let isLoggedIn = session.isLoggedIn
 	try {
 		await userResource.promise
+		isLoggedIn = session.isLoggedIn
 	} catch (error) {
 		isLoggedIn = false
 	}
@@ -89,15 +118,21 @@ router.beforeEach(async (to, from, next) => {
 	// Protected routes require authentication
 	if (to.matched.some(record => record.meta.requiresAuth)) {
 		if (!isLoggedIn) {
-			// Redirect to login if not authenticated
-			next({ name: "Login", query: { redirect: to.fullPath } })
+			// Redirect to auth if not authenticated
+			next({ name: "Auth", query: { redirect: to.fullPath } })
 			return
 		}
 	}
 
-	// Redirect authenticated users away from login/signup
-	if ((to.name === "Login" || to.name === "Signup") && isLoggedIn) {
-		next({ name: "Home" })
+	// Redirect authenticated users away from auth routes to dashboard
+	if ((to.name === "Auth" || to.name === "Login" || to.name === "Signup") && isLoggedIn) {
+		next({ name: "Dashboard" })
+		return
+	}
+
+	// Allow public routes without authentication
+	if (publicRoutes.includes(to.name)) {
+		next()
 		return
 	}
 
