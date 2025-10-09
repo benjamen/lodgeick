@@ -83,18 +83,16 @@ async function submit(e) {
 	error.value = ""
 	const formData = new FormData(e.target)
 
-	try {
-		await session.login.submit({
-			email: formData.get("email"),
-			password: formData.get("password"),
-		})
-	} catch (err) {
-		// Handle authentication errors
-		if (err.message && err.message.includes('AuthenticationError')) {
-			error.value = "Invalid username/email or password"
-		} else {
-			error.value = err.message || "Login failed. Please try again."
-		}
+	// Submit login
+	await session.login.submit({
+		email: formData.get("email"),
+		password: formData.get("password"),
+	})
+
+	// frappe-ui's createResource stores errors in resource.error
+	// Check if there was an error after submission
+	if (session.login.error) {
+		error.value = "Invalid username/email or password"
 	}
 }
 </script>
