@@ -35,174 +35,168 @@
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
       <!-- Progress Bar -->
       <StepProgressBar :current-step="onboardingStore.currentStep" :total-steps="4" />
 
       <!-- Header -->
       <div class="text-center mb-12">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">
-          {{ integrationComplete ? 'Integration Complete!' : 'One-Click Integration' }}
+          Connect Your Apps
         </h1>
         <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-          {{ integrationComplete
-            ? 'Your apps are now connected and ready to work together'
-            : 'Review and activate your integrations with a single click'
-          }}
+          Set up OAuth credentials and authorize each app to enable seamless integrations
         </p>
       </div>
 
-      <!-- Integration Status Card -->
-      <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
-        <!-- Success State -->
-        <div v-if="integrationComplete" class="text-center">
-          <!-- Success Animation -->
-          <div class="inline-flex items-center justify-center w-24 h-24 mb-6 bg-green-100 rounded-full animate-bounce-slow">
-            <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">
-            Successfully Integrated!
-          </h2>
-
-          <p class="text-gray-600 mb-8">
-            {{ connectedAppsList }} are now seamlessly connected
-          </p>
-
-          <!-- Integration Summary -->
-          <div class="bg-gray-50 rounded-lg p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <div class="text-3xl font-bold text-blue-600 mb-1">
-                  {{ onboardingStore.connectedApps.length }}
-                </div>
-                <div class="text-sm text-gray-600">Apps Connected</div>
-              </div>
-              <div>
-                <div class="text-3xl font-bold text-purple-600 mb-1">
-                  {{ selectedIntegrationCount }}
-                </div>
-                <div class="text-sm text-gray-600">Active Integrations</div>
-              </div>
-              <div>
-                <div class="text-3xl font-bold text-green-600 mb-1">
-                  100%
-                </div>
-                <div class="text-sm text-gray-600">Success Rate</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Loading/Progress State -->
-        <div v-else-if="isIntegrating" class="text-center">
-          <!-- Loading Spinner -->
-          <div class="inline-flex items-center justify-center w-24 h-24 mb-6">
-            <svg class="animate-spin h-24 w-24 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </div>
-
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">
-            Setting Up Your Integrations
-          </h2>
-
-          <p class="text-gray-600 mb-8">
-            Please wait while we configure your connections...
-          </p>
-
-          <!-- Progress Steps -->
-          <div class="space-y-4">
-            <div
-              v-for="(step, index) in integrationSteps"
-              :key="index"
-              class="flex items-center gap-3 p-4 rounded-lg transition-all"
-              :class="currentIntegrationStep > index ? 'bg-green-50' : currentIntegrationStep === index ? 'bg-blue-50' : 'bg-gray-50'"
-            >
+      <!-- Apps Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div
+          v-for="appId in onboardingStore.connectedApps"
+          :key="appId"
+          class="bg-white rounded-2xl shadow-lg p-6 transition-all duration-200 hover:shadow-xl"
+        >
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center gap-4">
               <div
-                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
-                :class="
-                  currentIntegrationStep > index
-                    ? 'bg-green-600'
-                    : currentIntegrationStep === index
-                    ? 'bg-blue-600'
-                    : 'bg-gray-300'
-                "
+                class="w-16 h-16 rounded-lg flex items-center justify-center text-3xl"
+                :class="getAppById(appId)?.color"
               >
-                <svg v-if="currentIntegrationStep > index" class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-                <svg v-else-if="currentIntegrationStep === index" class="animate-spin w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                {{ getAppById(appId)?.icon }}
               </div>
-              <div class="flex-1 text-left">
-                <div class="font-medium text-gray-900">{{ step.title }}</div>
-                <div class="text-sm text-gray-600">{{ step.description }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ready to Integrate State -->
-        <div v-else class="text-center">
-          <div class="inline-flex items-center justify-center w-24 h-24 mb-6 bg-blue-100 rounded-full">
-            <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">
-            Ready to Integrate
-          </h2>
-
-          <p class="text-gray-600 mb-8">
-            Click the button below to activate your integrations
-          </p>
-
-          <!-- Connected Apps Preview -->
-          <div class="bg-gray-50 rounded-lg p-6 mb-8">
-            <div class="flex flex-wrap justify-center gap-4">
-              <div
-                v-for="appId in onboardingStore.connectedApps"
-                :key="appId"
-                class="flex flex-col items-center"
-              >
-                <div
-                  class="w-16 h-16 rounded-lg flex items-center justify-center text-2xl mb-2"
-                  :class="getAppById(appId)?.color"
-                >
-                  {{ getAppById(appId)?.icon }}
-                </div>
-                <div class="text-sm font-medium text-gray-700">
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">
                   {{ getAppById(appId)?.name }}
-                </div>
+                </h3>
+                <p class="text-sm text-gray-500">
+                  {{ getAppById(appId)?.description }}
+                </p>
               </div>
+            </div>
+            <div
+              class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+              :class="getConnectionStatus(appId) === 'connected' ? 'bg-green-100' : getConnectionStatus(appId) === 'credentials' ? 'bg-yellow-100' : 'bg-gray-100'"
+            >
+              <svg
+                v-if="getConnectionStatus(appId) === 'connected'"
+                class="w-5 h-5 text-green-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              <svg
+                v-else-if="getConnectionStatus(appId) === 'credentials'"
+                class="w-5 h-5 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <svg
+                v-else
+                class="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
             </div>
           </div>
 
-          <PrimaryButton
-            label="Integrate Now"
-            size="large"
-            @click="startIntegration"
-          >
-            <template #icon>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </template>
-          </PrimaryButton>
+          <!-- Connection Steps -->
+          <div class="space-y-3">
+            <!-- Step 1: Set up OAuth Credentials -->
+            <div class="flex items-center gap-3">
+              <div
+                class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                :class="hasCredentials(appId) ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700'"
+              >
+                {{ hasCredentials(appId) ? '✓' : '1' }}
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">
+                  OAuth Credentials
+                </p>
+                <button
+                  v-if="!hasCredentials(appId)"
+                  @click="openWizard(appId)"
+                  class="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Set up credentials →
+                </button>
+                <p v-else class="text-xs text-green-600">
+                  Configured
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 2: Authorize -->
+            <div class="flex items-center gap-3">
+              <div
+                class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                :class="isAuthorized(appId) ? 'bg-green-500 text-white' : hasCredentials(appId) ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'"
+              >
+                {{ isAuthorized(appId) ? '✓' : '2' }}
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">
+                  Authorize Access
+                </p>
+                <button
+                  v-if="hasCredentials(appId) && !isAuthorized(appId)"
+                  @click="authorizeApp(appId)"
+                  :disabled="authorizingApp === appId"
+                  class="text-xs text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50"
+                >
+                  {{ authorizingApp === appId ? 'Authorizing...' : 'Authorize now →' }}
+                </button>
+                <p v-else-if="isAuthorized(appId)" class="text-xs text-green-600">
+                  Authorized
+                </p>
+                <p v-else class="text-xs text-gray-500">
+                  Complete step 1 first
+                </p>
+              </div>
+            </div>
+
+            <!-- Step 3: Test Connection -->
+            <div class="flex items-center gap-3">
+              <div
+                class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                :class="connectionTested[appId] ? 'bg-green-500 text-white' : isAuthorized(appId) ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'"
+              >
+                {{ connectionTested[appId] ? '✓' : '3' }}
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">
+                  Test Connection
+                </p>
+                <button
+                  v-if="isAuthorized(appId) && !connectionTested[appId]"
+                  @click="testConnection(appId)"
+                  :disabled="testingConnection === appId"
+                  class="text-xs text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50"
+                >
+                  {{ testingConnection === appId ? 'Testing...' : 'Test now →' }}
+                </button>
+                <p v-else-if="connectionTested[appId]" class="text-xs text-green-600">
+                  Connection verified
+                </p>
+                <p v-else class="text-xs text-gray-500">
+                  Complete step 2 first
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex justify-between items-center">
         <SecondaryButton
-          v-if="!integrationComplete"
           label="Back"
           @click="goBack"
         >
@@ -213,14 +207,15 @@
           </template>
         </SecondaryButton>
 
-        <div v-if="integrationComplete" class="flex gap-3 ml-auto">
+        <div class="flex gap-3">
           <SecondaryButton
-            label="Skip Field Mapping"
+            label="Skip for Now"
             @click="skipToCompletion"
           />
 
           <PrimaryButton
-            label="Configure Fields"
+            label="Continue"
+            :disabled="!allAppsConnected"
             @click="nextStep"
           >
             <template #iconRight>
@@ -232,17 +227,27 @@
         </div>
       </div>
     </div>
+
+    <!-- OAuth Setup Wizard Modal -->
+    <OAuthSetupWizard
+      :show="wizardVisible"
+      :provider="selectedProvider"
+      @close="wizardVisible = false"
+      @success="handleCredentialsSaved"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { createResource } from 'frappe-ui'
 import { session } from '@/data/session'
 import { useOnboardingStore } from '@/stores/onboarding'
 import StepProgressBar from '@/components/onboarding/StepProgressBar.vue'
 import PrimaryButton from '@/components/onboarding/PrimaryButton.vue'
 import SecondaryButton from '@/components/onboarding/SecondaryButton.vue'
+import OAuthSetupWizard from '@/components/OAuthSetupWizard.vue'
 
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
@@ -251,57 +256,127 @@ const handleLogout = () => {
   session.logout.submit()
 }
 
-const isIntegrating = ref(false)
-const integrationComplete = ref(false)
-const currentIntegrationStep = ref(0)
+// State
+const wizardVisible = ref(false)
+const selectedProvider = ref('')
+const authorizingApp = ref(null)
+const testingConnection = ref(null)
+const connectionTested = ref({})
+const appCredentials = ref({}) // Track which apps have credentials
+const appTokens = ref({}) // Track which apps have tokens
 
-const integrationSteps = [
-  { title: 'Authenticating apps', description: 'Verifying credentials and permissions' },
-  { title: 'Establishing connections', description: 'Creating secure communication channels' },
-  { title: 'Configuring webhooks', description: 'Setting up real-time data synchronization' },
-  { title: 'Testing integrations', description: 'Ensuring everything works correctly' },
-]
-
-const connectedAppsList = computed(() => {
-  const apps = onboardingStore.connectedApps.map(id => getAppById(id)?.name).filter(Boolean)
-  if (apps.length === 0) return ''
-  if (apps.length === 1) return apps[0]
-  if (apps.length === 2) return `${apps[0]} and ${apps[1]}`
-  return `${apps.slice(0, -1).join(', ')}, and ${apps[apps.length - 1]}`
-})
-
-const selectedIntegrationCount = computed(() => {
-  // Create default integrations between all connected apps
-  const count = onboardingStore.connectedApps.length
-  return count > 1 ? Math.floor((count * (count - 1)) / 2) : count
-})
-
+// Get app by ID
 const getAppById = (appId) => {
   return onboardingStore.availableApps.find(app => app.id === appId)
 }
 
-const startIntegration = async () => {
-  isIntegrating.value = true
-  currentIntegrationStep.value = 0
-
-  // Simulate integration process
-  for (let i = 0; i < integrationSteps.length; i++) {
-    currentIntegrationStep.value = i
-    await new Promise(resolve => setTimeout(resolve, 1500))
-  }
-
-  // Create default integrations between all connected apps
-  const connectedApps = onboardingStore.connectedApps
-  for (let i = 0; i < connectedApps.length; i++) {
-    for (let j = i + 1; j < connectedApps.length; j++) {
-      onboardingStore.addIntegration(connectedApps[i], connectedApps[j])
-    }
-  }
-
-  isIntegrating.value = false
-  integrationComplete.value = true
+// Check if app has credentials
+const hasCredentials = (appId) => {
+  return appCredentials.value[appId] === true
 }
 
+// Check if app is authorized (has token)
+const isAuthorized = (appId) => {
+  return appTokens.value[appId] === true
+}
+
+// Get connection status
+const getConnectionStatus = (appId) => {
+  if (isAuthorized(appId) && connectionTested.value[appId]) {
+    return 'connected'
+  } else if (hasCredentials(appId)) {
+    return 'credentials'
+  }
+  return 'not-connected'
+}
+
+// Check if all apps are connected
+const allAppsConnected = computed(() => {
+  return onboardingStore.connectedApps.every(appId =>
+    isAuthorized(appId) && connectionTested.value[appId]
+  )
+})
+
+// Open OAuth wizard for an app
+const openWizard = (appId) => {
+  const app = getAppById(appId)
+  if (app) {
+    selectedProvider.value = app.oauth_provider || appId
+    wizardVisible.value = true
+  }
+}
+
+// Handle credentials saved
+const handleCredentialsSaved = (data) => {
+  wizardVisible.value = false
+  // Mark credentials as saved for this provider
+  const appId = onboardingStore.connectedApps.find(id => {
+    const app = getAppById(id)
+    return app && (app.oauth_provider === data.provider || app.id === data.provider)
+  })
+  if (appId) {
+    appCredentials.value[appId] = true
+  }
+}
+
+// Authorize app - initiate OAuth flow
+const authorizeApp = async (appId) => {
+  const app = getAppById(appId)
+  if (!app) return
+
+  authorizingApp.value = appId
+  const provider = app.oauth_provider || appId
+
+  try {
+    const response = await initiateOAuthResource.submit({ provider })
+    if (response.success && response.authorization_url) {
+      // Redirect to OAuth provider
+      window.location.href = response.authorization_url
+    }
+  } catch (error) {
+    console.error('Failed to initiate OAuth:', error)
+    alert('Failed to start authorization. Please check your credentials.')
+  } finally {
+    authorizingApp.value = null
+  }
+}
+
+// Test connection
+const testConnection = async (appId) => {
+  const app = getAppById(appId)
+  if (!app) return
+
+  testingConnection.value = appId
+  const provider = app.oauth_provider || appId
+
+  try {
+    // Simulate connection test (replace with actual API call)
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    connectionTested.value[appId] = true
+
+    // In a real implementation, you would call an API like:
+    // const response = await testConnectionResource.submit({ provider })
+    // connectionTested.value[appId] = response.success
+  } catch (error) {
+    console.error('Connection test failed:', error)
+    alert('Connection test failed. Please try authorizing again.')
+  } finally {
+    testingConnection.value = null
+  }
+}
+
+// Initiate OAuth resource
+const initiateOAuthResource = createResource({
+  url: 'lodgeick.api.oauth.initiate_oauth',
+  makeParams(values) {
+    return {
+      provider: values.provider,
+      redirect_uri: window.location.origin + '/oauth/callback'
+    }
+  }
+})
+
+// Navigation
 const nextStep = () => {
   onboardingStore.nextStep()
   router.push({ name: 'Configure' })
@@ -317,25 +392,37 @@ const goBack = () => {
   router.push({ name: 'ConnectApps' })
 }
 
+// Check for OAuth callback on mount
 onMounted(() => {
   // If no apps connected, redirect back
   if (onboardingStore.connectedApps.length === 0) {
     router.push({ name: 'ConnectApps' })
+    return
+  }
+
+  // Check if returning from OAuth callback
+  const urlParams = new URLSearchParams(window.location.search)
+  const success = urlParams.get('oauth_success')
+  const provider = urlParams.get('provider')
+
+  if (success === 'true' && provider) {
+    // Find the app with this provider
+    const appId = onboardingStore.connectedApps.find(id => {
+      const app = getAppById(id)
+      return app && (app.oauth_provider === provider || app.id === provider)
+    })
+
+    if (appId) {
+      appTokens.value[appId] = true
+      appCredentials.value[appId] = true
+    }
+
+    // Clean up URL
+    window.history.replaceState({}, document.title, window.location.pathname)
   }
 })
 </script>
 
 <style scoped>
-@keyframes bounce-slow {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-bounce-slow {
-  animation: bounce-slow 2s infinite;
-}
+/* Add any custom styles here */
 </style>
