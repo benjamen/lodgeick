@@ -15,6 +15,18 @@
 
     <!-- Navigation -->
     <nav class="flex-1 p-4 space-y-1">
+      <!-- Back to Dashboard -->
+      <router-link
+        to="/dashboard"
+        @click="$emit('navigate')"
+        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group mb-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
+      >
+        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Back to Dashboard</span>
+      </router-link>
+
       <router-link
         v-for="item in navigation"
         :key="item.path"
