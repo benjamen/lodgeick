@@ -73,7 +73,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { ref } from "vue"
 import { session } from "../data/session"
 

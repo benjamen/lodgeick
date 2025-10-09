@@ -1,5 +1,13 @@
 // Initialize frappe shim BEFORE any imports that might use it
-if (!window.frappe) {
+// This MUST be the very first code that runs
+;(() => {
+	if (window.frappe) {
+		console.log('[Frappe Shim] Already initialized')
+		return
+	}
+
+	console.log('[Frappe Shim] Initializing...')
+
 	window.frappe = {
 		_messages: {},
 		boot: { lang: 'en', sysdefaults: {}, user: {} },
@@ -43,7 +51,9 @@ if (!window.frappe) {
 	window.cur_frm = null
 	window.cur_list = null
 	window.cur_dialog = null
-}
+
+	console.log('[Frappe Shim] Initialized successfully')
+})()
 
 import { createApp } from "vue"
 import { createPinia } from "pinia"
