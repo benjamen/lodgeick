@@ -157,18 +157,8 @@ class N8NIntegrationSync:
 			"connections": connections,
 			"active": integration_doc.status == "Active",
 			"settings": {
-				"saveDataErrorExecution": "all",
-				"saveDataSuccessExecution": "all",
-				"saveManualExecutions": True,
-				"callerPolicy": "workflowsFromSameOwner",
-				"executionTimeout": 3600
-			},
-			"staticData": None,
-			"tags": [
-				{"name": "lodgeick"},
-				{"name": f"user:{integration_doc.user}"},
-				{"name": f"integration:{integration_doc.name}"}
-			]
+				"executionOrder": "v1"
+			}
 		}
 
 		return workflow_data
@@ -192,6 +182,9 @@ class N8NIntegrationSync:
 			# Build workflow configuration
 			workflow_data = self._build_workflow_json(integration_doc)
 
+			# Remove 'active' field - it's read-only on creation
+			should_activate = workflow_data.pop("active", False)
+
 			# Create workflow in n8n
 			response = self.client.create_workflow(workflow_data)
 
@@ -204,6 +197,10 @@ class N8NIntegrationSync:
 			integration_doc.workflow_id = str(workflow_id)
 			integration_doc.save(ignore_permissions=True)
 			frappe.db.commit()
+
+			# Activate if needed
+			if should_activate:
+				self.client.activate_workflow(workflow_id)
 
 			frappe.logger().info(f"Created n8n workflow {workflow_id} for integration {integration_doc.name}")
 

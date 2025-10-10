@@ -66,6 +66,13 @@ class N8NClient:
 
 		except requests.exceptions.RequestException as e:
 			error_msg = f"n8n API request failed: {str(e)}"
+			# Try to get response body for more details
+			if hasattr(e, 'response') and e.response is not None:
+				try:
+					error_detail = e.response.json()
+					error_msg += f"\nResponse: {json.dumps(error_detail, indent=2)}"
+				except:
+					error_msg += f"\nResponse text: {e.response.text[:500]}"
 			frappe.log_error(error_msg, "N8N API Error")
 			raise Exception(error_msg)
 
