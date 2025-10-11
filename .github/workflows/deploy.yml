@@ -59,6 +59,7 @@ jobs:
             bench --site lodgeick.com migrate || echo 'Migration skipped or failed'
             echo '🧹 Clearing cache...'
             bench --site lodgeick.com clear-cache
+            bench --site lodgeick.com clear-website-cache
             echo '🔄 Restarting services...'
             bench restart
 
