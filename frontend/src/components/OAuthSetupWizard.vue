@@ -55,8 +55,98 @@
 
           <!-- Step Content -->
           <div class="step-content">
-            <!-- Step 0: Create Google Cloud Project -->
-            <div v-if="currentStep === 0" class="step">
+            <!-- Step 0: Setup Method Choice (Google only) -->
+            <div v-if="currentStep === 0 && provider === 'google'" class="step">
+              <h5 class="font-weight-bold mb-3 text-center">
+                <i class="fas fa-route text-primary me-2"></i>
+                Choose Your Setup Method
+              </h5>
+              <p class="text-center text-muted mb-4">
+                Select how you'd like to set up your Google Cloud integration
+              </p>
+
+              <div class="row g-4">
+                <!-- AI-Powered Setup Option -->
+                <div class="col-md-6">
+                  <div
+                    class="card h-100 setup-option"
+                    :class="{ 'border-primary selected': setupMethod === 'ai' }"
+                    @click="setupMethod = 'ai'"
+                    style="cursor: pointer;"
+                  >
+                    <div class="card-body text-center p-4">
+                      <div class="mb-3">
+                        <i class="fas fa-robot fa-3x text-primary"></i>
+                      </div>
+                      <h5 class="card-title font-weight-bold">
+                        🤖 AI-Powered Setup
+                      </h5>
+                      <p class="card-text text-muted">
+                        Describe what you want in plain English and let AI handle everything.
+                      </p>
+                      <div class="mt-3">
+                        <span class="badge bg-success me-1">Recommended</span>
+                        <span class="badge bg-info">Fastest</span>
+                      </div>
+                      <hr class="my-3">
+                      <ul class="text-start small text-muted">
+                        <li>Natural language input</li>
+                        <li>Automatic API selection</li>
+                        <li>Smart billing detection</li>
+                        <li>Project creation (optional)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Manual Setup Option -->
+                <div class="col-md-6">
+                  <div
+                    class="card h-100 setup-option"
+                    :class="{ 'border-primary selected': setupMethod === 'manual' }"
+                    @click="setupMethod = 'manual'"
+                    style="cursor: pointer;"
+                  >
+                    <div class="card-body text-center p-4">
+                      <div class="mb-3">
+                        <i class="fas fa-list-ol fa-3x text-warning"></i>
+                      </div>
+                      <h5 class="card-title font-weight-bold">
+                        📋 Manual Step-by-Step
+                      </h5>
+                      <p class="card-text text-muted">
+                        Follow detailed instructions to set up Google Cloud manually.
+                      </p>
+                      <div class="mt-3">
+                        <span class="badge bg-secondary">Traditional</span>
+                        <span class="badge bg-primary">Full Control</span>
+                      </div>
+                      <hr class="my-3">
+                      <ul class="text-start small text-muted">
+                        <li>Step-by-step guidance</li>
+                        <li>Use existing project</li>
+                        <li>Manual API selection</li>
+                        <li>Complete control</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center mt-4">
+                <button
+                  class="btn btn-primary btn-lg"
+                  @click="proceedWithSetupMethod"
+                  :disabled="!setupMethod"
+                >
+                  <i class="fas fa-arrow-right me-2"></i>
+                  Continue with {{ setupMethod === 'ai' ? 'AI-Powered' : 'Manual' }} Setup
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 0 (Non-Google): Create Google Cloud Project -->
+            <div v-if="currentStep === 0 && provider !== 'google'" class="step">
               <h5 class="font-weight-bold mb-3">
                 <i class="fab fa-google text-primary me-2"></i>
                 Create Google Cloud Project
@@ -390,9 +480,10 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['close', 'success'])
+const emit = defineEmits(['close', 'success', 'launchAIWizard'])
 
 const currentStep = ref(0)
+const setupMethod = ref(null) // 'ai' or 'manual'
 const clientId = ref('')
 const clientSecret = ref('')
 const showSecret = ref(false)
@@ -445,6 +536,17 @@ const saveCredentialsResource = createResource({
   }
 })
 
+function proceedWithSetupMethod() {
+  if (setupMethod.value === 'ai') {
+    // Close this wizard and launch AI wizard
+    emit('launchAIWizard')
+    closeWizard()
+  } else {
+    // Continue with manual setup
+    currentStep.value = 1
+  }
+}
+
 function nextStep() {
   if (currentStep.value < steps.length - 1) {
     currentStep.value++
@@ -481,6 +583,7 @@ function copyToClipboard(text) {
 
 function closeWizard() {
   currentStep.value = 0
+  setupMethod.value = null
   clientId.value = ''
   clientSecret.value = ''
   showSecret.value = false
@@ -566,5 +669,20 @@ function closeWizard() {
 .modal-dialog-scrollable .modal-body {
   max-height: calc(100vh - 200px);
   overflow-y: auto;
+}
+
+.setup-option {
+  transition: all 0.3s ease;
+  border: 2px solid #e9ecef;
+}
+
+.setup-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.setup-option.selected {
+  border-color: #7928CA !important;
+  box-shadow: 0 4px 20px rgba(121, 40, 202, 0.2);
 }
 </style>

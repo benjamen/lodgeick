@@ -234,6 +234,14 @@
       :provider="selectedProvider"
       @close="wizardVisible = false"
       @success="handleCredentialsSaved"
+      @launch-a-i-wizard="launchAIWizard"
+    />
+
+    <!-- Google AI Setup Wizard Modal -->
+    <GoogleAISetupWizard
+      :show="aiWizardVisible"
+      @close="aiWizardVisible = false"
+      @success="handleAISetupComplete"
     />
   </div>
 </template>
@@ -248,6 +256,7 @@ import StepProgressBar from '@/components/onboarding/StepProgressBar.vue'
 import PrimaryButton from '@/components/onboarding/PrimaryButton.vue'
 import SecondaryButton from '@/components/onboarding/SecondaryButton.vue'
 import OAuthSetupWizard from '@/components/OAuthSetupWizard.vue'
+import GoogleAISetupWizard from '@/components/GoogleAISetupWizard.vue'
 
 const router = useRouter()
 const onboardingStore = useOnboardingStore()
@@ -258,6 +267,7 @@ const handleLogout = () => {
 
 // State
 const wizardVisible = ref(false)
+const aiWizardVisible = ref(false)
 const selectedProvider = ref('')
 const authorizingApp = ref(null)
 const testingConnection = ref(null)
@@ -317,6 +327,27 @@ const handleCredentialsSaved = (data) => {
   if (appId) {
     appCredentials.value[appId] = true
   }
+}
+
+// Launch AI Setup Wizard
+const launchAIWizard = () => {
+  wizardVisible.value = false
+  aiWizardVisible.value = true
+}
+
+// Handle AI setup complete
+const handleAISetupComplete = (data) => {
+  aiWizardVisible.value = false
+  // Mark Google as having credentials
+  const googleAppId = onboardingStore.connectedApps.find(id => {
+    const app = getAppById(id)
+    return app && (app.oauth_provider === 'google' || app.id === 'google')
+  })
+  if (googleAppId) {
+    appCredentials.value[googleAppId] = true
+  }
+  // Show success message
+  alert('Google Cloud integration setup complete! You can now authorize access.')
 }
 
 // Authorize app - initiate OAuth flow
