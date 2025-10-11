@@ -359,6 +359,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue"
 import { createResource, call } from "frappe-ui"
+import TierDetailsModal from './TierDetailsModal.vue'
+import HelpModal from './HelpModal.vue'
 
 const props = defineProps({
   show: {

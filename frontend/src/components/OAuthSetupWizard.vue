@@ -511,7 +511,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, watch, onMounted } from "vue"
 import { createResource, call } from "frappe-ui"
 
 const props = defineProps({
@@ -533,13 +533,31 @@ const clientId = ref('')
 const clientSecret = ref('')
 const showSecret = ref(false)
 const saving = ref(false)
+const loading = ref(true)
 const tierConfig = ref(null)
+const errorMessage = ref(null)
+const successMessage = ref(null)
 
 // Load tier configuration for this provider
-call('lodgeick.api.oauth_tiers.get_tier_config', {
-  provider: props.provider
-}).then((config) => {
-  tierConfig.value = config
+onMounted(async () => {
+  try {
+    loading.value = true
+    const config = await call('lodgeick.api.oauth_tiers.get_tier_config', {
+      provider: props.provider
+    })
+    tierConfig.value = config
+  } catch (error) {
+    errorMessage.value = `Failed to load setup options: ${error.message}`
+  } finally {
+    loading.value = false
+  }
+})
+
+// Watch for prop changes
+watch(() => props.show, (newVal) => {
+  if (newVal && !tierConfig.value) {
+    onMounted()
+  }
 })
 
 const providerName = computed(() => {
