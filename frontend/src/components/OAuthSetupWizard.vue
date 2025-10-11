@@ -55,19 +55,60 @@
 
           <!-- Step Content -->
           <div class="step-content">
-            <!-- Step 0: Setup Method Choice (Google only) -->
-            <div v-if="currentStep === 0 && provider === 'google'" class="step">
+            <!-- Step 0: Setup Method Choice -->
+            <div v-if="currentStep === 0" class="step">
               <h5 class="font-weight-bold mb-3 text-center">
                 <i class="fas fa-route text-primary me-2"></i>
                 Choose Your Setup Method
               </h5>
               <p class="text-center text-muted mb-4">
-                Select how you'd like to set up your Google Cloud integration
+                Select how you'd like to set up your {{ providerName }} integration
               </p>
 
               <div class="row g-4">
+                <!-- Quick Start (Default/Shared App) Option -->
+                <div v-if="tierConfig?.tiers?.default?.enabled" class="col-md-4">
+                  <div
+                    class="card h-100 setup-option"
+                    :class="{ 'border-primary selected': setupMethod === 'default' }"
+                    @click="setupMethod = 'default'"
+                    style="cursor: pointer;"
+                  >
+                    <div class="card-body text-center p-4">
+                      <div class="mb-3">
+                        <i class="fas fa-bolt fa-3x text-warning"></i>
+                      </div>
+                      <h5 class="card-title font-weight-bold">
+                        {{ tierConfig.tiers.default.icon }} {{ tierConfig.tiers.default.label }}
+                      </h5>
+                      <p class="card-text text-muted small">
+                        {{ tierConfig.tiers.default.description }}
+                      </p>
+                      <div class="mt-3">
+                        <span class="badge bg-success me-1">{{ tierConfig.tiers.default.setup_time }}</span>
+                        <span class="badge bg-info">No Setup</span>
+                      </div>
+                      <hr class="my-3">
+                      <div class="text-start">
+                        <div class="small text-success mb-2">
+                          <i class="fas fa-check-circle me-1"></i> <strong>Pros:</strong>
+                        </div>
+                        <ul class="small text-muted mb-2" style="font-size: 0.85rem;">
+                          <li v-for="adv in tierConfig.tiers.default.advantages.slice(0,3)" :key="adv">{{ adv }}</li>
+                        </ul>
+                        <div class="small text-warning mb-2">
+                          <i class="fas fa-exclamation-circle me-1"></i> <strong>Limits:</strong>
+                        </div>
+                        <ul class="small text-muted" style="font-size: 0.85rem;">
+                          <li v-for="lim in tierConfig.tiers.default.limitations.slice(0,2)" :key="lim">{{ lim }}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- AI-Powered Setup Option -->
-                <div class="col-md-6">
+                <div v-if="tierConfig?.tiers?.ai?.enabled" class="col-md-4">
                   <div
                     class="card h-100 setup-option"
                     :class="{ 'border-primary selected': setupMethod === 'ai' }"
@@ -79,28 +120,30 @@
                         <i class="fas fa-robot fa-3x text-primary"></i>
                       </div>
                       <h5 class="card-title font-weight-bold">
-                        🤖 AI-Powered Setup
+                        {{ tierConfig.tiers.ai.icon }} {{ tierConfig.tiers.ai.label }}
                       </h5>
-                      <p class="card-text text-muted">
-                        Describe what you want in plain English and let AI handle everything.
+                      <p class="card-text text-muted small">
+                        {{ tierConfig.tiers.ai.description }}
                       </p>
                       <div class="mt-3">
                         <span class="badge bg-success me-1">Recommended</span>
-                        <span class="badge bg-info">Fastest</span>
+                        <span class="badge bg-primary">{{ tierConfig.tiers.ai.setup_time }}</span>
                       </div>
                       <hr class="my-3">
-                      <ul class="text-start small text-muted">
-                        <li>Natural language input</li>
-                        <li>Automatic API selection</li>
-                        <li>Smart billing detection</li>
-                        <li>Project creation (optional)</li>
-                      </ul>
+                      <div class="text-start">
+                        <div class="small text-success mb-2">
+                          <i class="fas fa-check-circle me-1"></i> <strong>Pros:</strong>
+                        </div>
+                        <ul class="small text-muted mb-2" style="font-size: 0.85rem;">
+                          <li v-for="adv in tierConfig.tiers.ai.advantages.slice(0,3)" :key="adv">{{ adv }}</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Manual Setup Option -->
-                <div class="col-md-6">
+                <div v-if="tierConfig?.tiers?.manual?.enabled" :class="tierConfig?.tiers?.ai?.enabled ? 'col-md-4' : 'col-md-6'">
                   <div
                     class="card h-100 setup-option"
                     :class="{ 'border-primary selected': setupMethod === 'manual' }"
@@ -109,25 +152,27 @@
                   >
                     <div class="card-body text-center p-4">
                       <div class="mb-3">
-                        <i class="fas fa-list-ol fa-3x text-warning"></i>
+                        <i class="fas fa-tools fa-3x text-secondary"></i>
                       </div>
                       <h5 class="card-title font-weight-bold">
-                        📋 Manual Step-by-Step
+                        {{ tierConfig?.tiers?.manual?.icon || '🔧' }} {{ tierConfig?.tiers?.manual?.label || 'Manual Setup' }}
                       </h5>
-                      <p class="card-text text-muted">
-                        Follow detailed instructions to set up Google Cloud manually.
+                      <p class="card-text text-muted small">
+                        {{ tierConfig?.tiers?.manual?.description || 'Step-by-step setup' }}
                       </p>
                       <div class="mt-3">
-                        <span class="badge bg-secondary">Traditional</span>
-                        <span class="badge bg-primary">Full Control</span>
+                        <span class="badge bg-secondary">Advanced</span>
+                        <span class="badge bg-info">{{ tierConfig?.tiers?.manual?.setup_time || '~10 min' }}</span>
                       </div>
                       <hr class="my-3">
-                      <ul class="text-start small text-muted">
-                        <li>Step-by-step guidance</li>
-                        <li>Use existing project</li>
-                        <li>Manual API selection</li>
-                        <li>Complete control</li>
-                      </ul>
+                      <div class="text-start">
+                        <div class="small text-success mb-2">
+                          <i class="fas fa-check-circle me-1"></i> <strong>Pros:</strong>
+                        </div>
+                        <ul class="small text-muted mb-2" style="font-size: 0.85rem;">
+                          <li v-for="adv in (tierConfig?.tiers?.manual?.advantages || []).slice(0,3)" :key="adv">{{ adv }}</li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -140,7 +185,7 @@
                   :disabled="!setupMethod"
                 >
                   <i class="fas fa-arrow-right me-2"></i>
-                  Continue with {{ setupMethod === 'ai' ? 'AI-Powered' : 'Manual' }} Setup
+                  Continue with {{ setupMethodLabel }}
                 </button>
               </div>
             </div>
@@ -467,7 +512,7 @@
 
 <script setup>
 import { ref, computed } from "vue"
-import { createResource } from "frappe-ui"
+import { createResource, call } from "frappe-ui"
 
 const props = defineProps({
   show: {
@@ -483,19 +528,37 @@ const props = defineProps({
 const emit = defineEmits(['close', 'success', 'launchAIWizard'])
 
 const currentStep = ref(0)
-const setupMethod = ref(null) // 'ai' or 'manual'
+const setupMethod = ref(null) // 'default', 'ai', or 'manual'
 const clientId = ref('')
 const clientSecret = ref('')
 const showSecret = ref(false)
 const saving = ref(false)
+const tierConfig = ref(null)
+
+// Load tier configuration for this provider
+call('lodgeick.api.oauth_tiers.get_tier_config', {
+  provider: props.provider
+}).then((config) => {
+  tierConfig.value = config
+})
 
 const providerName = computed(() => {
   const names = {
     google: 'Google (Gmail, Sheets, Drive)',
     xero: 'Xero',
-    slack: 'Slack'
+    slack: 'Slack',
+    microsoft: 'Microsoft 365',
+    hubspot: 'HubSpot',
+    salesforce: 'Salesforce',
+    stripe: 'Stripe'
   }
   return names[props.provider] || props.provider
+})
+
+const setupMethodLabel = computed(() => {
+  if (!setupMethod.value || !tierConfig.value) return ''
+  const tier = tierConfig.value?.tiers?.[setupMethod.value]
+  return tier?.label || setupMethod.value
 })
 
 const redirectUri = computed(() => {
@@ -513,21 +576,31 @@ const steps = [
 
 // Save credentials resource
 const saveCredentialsResource = createResource({
-  url: "lodgeick.api.oauth.save_oauth_credentials",
-  makeParams() {
+  url: "lodgeick.api.oauth.save_user_oauth_setup",
+  makeParams(params) {
+    if (params?.use_default) {
+      return {
+        provider: props.provider,
+        tier: 'default',
+        use_default: true
+      }
+    }
     return {
       provider: props.provider,
+      tier: setupMethod.value || 'manual',
       client_id: clientId.value,
       client_secret: clientSecret.value
     }
   },
-  onSuccess() {
+  onSuccess(data) {
     saving.value = false
-    currentStep.value = 5
+    if (data.ready_to_connect) {
+      currentStep.value = 5
+    }
     emit('success', {
       provider: props.provider,
-      client_id: clientId.value,
-      client_secret: clientSecret.value
+      tier: setupMethod.value,
+      ready_to_connect: data.ready_to_connect
     })
   },
   onError(error) {
@@ -537,7 +610,16 @@ const saveCredentialsResource = createResource({
 })
 
 function proceedWithSetupMethod() {
-  if (setupMethod.value === 'ai') {
+  if (setupMethod.value === 'default') {
+    // Use Lodgeick's shared OAuth app - no setup needed
+    // This will use default credentials from site_config
+    saving.value = true
+    saveCredentialsResource.submit({
+      provider: props.provider,
+      tier: 'default',
+      use_default: true
+    })
+  } else if (setupMethod.value === 'ai') {
     // Close this wizard and launch AI wizard
     emit('launchAIWizard')
     closeWizard()

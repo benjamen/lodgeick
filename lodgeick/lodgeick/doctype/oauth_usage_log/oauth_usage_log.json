@@ -1,0 +1,134 @@
+{
+ "actions": [],
+ "creation": "2025-01-11 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "provider",
+  "tier",
+  "api_name",
+  "column_break_1",
+  "requests_today",
+  "requests_this_minute",
+  "last_request_time",
+  "daily_limit",
+  "minute_limit",
+  "column_break_2",
+  "last_reset_daily",
+  "last_reset_minute",
+  "status",
+  "warning_sent"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "provider",
+   "fieldtype": "Select",
+   "label": "Provider",
+   "options": "google\nslack\nxero\nmicrosoft\nhubspot\nsalesforce\nstripe",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tier",
+   "fieldtype": "Select",
+   "label": "Tier",
+   "options": "default\nai\nmanual",
+   "reqd": 1
+  },
+  {
+   "fieldname": "api_name",
+   "fieldtype": "Data",
+   "label": "API Name"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "requests_today",
+   "fieldtype": "Int",
+   "label": "Requests Today",
+   "default": "0"
+  },
+  {
+   "fieldname": "requests_this_minute",
+   "fieldtype": "Int",
+   "label": "Requests This Minute",
+   "default": "0"
+  },
+  {
+   "fieldname": "last_request_time",
+   "fieldtype": "Datetime",
+   "label": "Last Request Time"
+  },
+  {
+   "fieldname": "daily_limit",
+   "fieldtype": "Int",
+   "label": "Daily Limit"
+  },
+  {
+   "fieldname": "minute_limit",
+   "fieldtype": "Int",
+   "label": "Minute Limit"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_reset_daily",
+   "fieldtype": "Datetime",
+   "label": "Last Reset (Daily)"
+  },
+  {
+   "fieldname": "last_reset_minute",
+   "fieldtype": "Datetime",
+   "label": "Last Reset (Minute)"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nWarning\nLimit Reached",
+   "default": "Active"
+  },
+  {
+   "fieldname": "warning_sent",
+   "fieldtype": "Check",
+   "label": "Warning Sent",
+   "default": "0"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-11 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Lodgeick",
+ "name": "OAuth Usage Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

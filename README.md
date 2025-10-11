@@ -9,9 +9,11 @@ Lodgeick eliminates the complexity of connecting your favorite business tools. U
 ### Key Features
 
 - ✅ **One-Click Integration Setup** - No workflow building required
+- 🎯 **Three-Tier OAuth System** - Choose your setup style: Quick Start, AI-Powered, or Manual
 - 🤖 **AI-Powered Google Setup** - Natural language to Google Cloud integration
 - 🔐 **Secure OAuth Authentication** - Enterprise-grade token management
 - 📊 **Real-time Monitoring** - Track integration status and execution logs
+- ⚡ **Smart Rate Limiting** - Automatic usage tracking and quota management
 - 🎨 **Beautiful Vue.js Frontend** - Modern, responsive UI with Tailwind CSS
 - 🔄 **n8n Workflow Engine** - Powerful automation behind the scenes
 - 🚀 **50+ App Catalog** - Popular business applications ready to connect
@@ -98,8 +100,33 @@ Lodgeick includes an intelligent setup wizard for Google Cloud integrations:
 
 See [AI_SETUP_GUIDE.md](./AI_SETUP_GUIDE.md) for detailed documentation.
 
+## 🎯 Three-Tier OAuth System
+
+Lodgeick offers three flexible OAuth setup options:
+
+### 1. Quick Start (Default Tier) ⚡
+- **Setup Time**: Instant
+- **Use Case**: Testing, personal projects
+- **Rate Limits**: Shared (100-500 requests/day depending on API)
+- **Providers**: Google, Slack, Xero, Microsoft 365, HubSpot
+
+### 2. AI-Powered Setup (Recommended) 🤖
+- **Setup Time**: ~2 minutes
+- **Use Case**: Most users, production workflows
+- **Rate Limits**: Unlimited (your own quotas)
+- **Providers**: Google (with AI assistance)
+
+### 3. Manual Setup (Advanced) 🔧
+- **Setup Time**: ~10 minutes
+- **Use Case**: Enterprises, custom configurations
+- **Rate Limits**: Unlimited
+- **Providers**: All supported providers
+
+See [OAuth Tiers Guide](./OAUTH_TIERS_GUIDE.md) for detailed comparison and setup instructions.
+
 ## 📖 Additional Documentation
 
+- [OAuth Tiers Guide](./OAUTH_TIERS_GUIDE.md) - Three-tier OAuth system overview
 - [AI Setup Guide](./AI_SETUP_GUIDE.md) - AI-powered Google integration setup
 - [OAuth Setup](./OAUTH_SETUP.md) - Manual OAuth configuration
 - [N8N Integration](./N8N_INTEGRATION.md) - n8n workflow sync

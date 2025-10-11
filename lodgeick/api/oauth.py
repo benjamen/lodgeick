@@ -310,35 +310,70 @@ def calculate_expiry(expires_in):
 
 
 @frappe.whitelist()
-def save_oauth_credentials(provider, client_id, client_secret):
+def save_user_oauth_setup(provider, tier='manual', client_id=None, client_secret=None, use_default=False):
 	"""
-	Save OAuth credentials to site config
+	Save user's OAuth setup choice (tier selection)
 
 	Args:
 		provider: Provider name (e.g., 'google', 'xero', 'slack')
-		client_id: OAuth client ID
-		client_secret: OAuth client secret
+		tier: Setup tier ('default', 'ai', 'manual')
+		client_id: OAuth client ID (for manual tier)
+		client_secret: OAuth client secret (for manual tier)
+		use_default: Whether to use default Lodgeick OAuth app
 
 	Returns:
 		dict: Success status
 	"""
-	# Validate input
-	if not provider or not client_id or not client_secret:
-		frappe.throw(_("Provider, client_id, and client_secret are required"))
+	user = frappe.session.user
 
-	# Update site config
-	frappe.conf[f"{provider}_client_id"] = client_id
-	frappe.conf[f"{provider}_client_secret"] = client_secret
+	# Handle default tier (use Lodgeick's shared OAuth app)
+	if tier == 'default' or use_default:
+		# Check if default credentials are available
+		default_client_id = frappe.conf.get(f"{provider}_client_id")
+		default_client_secret = frappe.conf.get(f"{provider}_client_secret")
 
-	# Save to site_config.json
-	from frappe.installer import update_site_config
-	update_site_config(f"{provider}_client_id", client_id)
-	update_site_config(f"{provider}_client_secret", client_secret)
+		if not default_client_id or not default_client_secret:
+			frappe.throw(_(f"Default OAuth app for {provider} is not configured. Please use AI or Manual setup."))
 
-	return {
-		"success": True,
-		"message": f"OAuth credentials for {provider} saved successfully"
-	}
+		# Create usage tracking record for rate limiting
+		from lodgeick.lodgeick.doctype.oauth_usage_log.oauth_usage_log import check_rate_limit
+
+		# Initialize usage log
+		check_rate_limit(user, provider, 'default')
+
+		return {
+			"success": True,
+			"message": f"Using Lodgeick's shared {provider.title()} app",
+			"tier": "default",
+			"ready_to_connect": True
+		}
+
+	# Handle manual tier (user provides their own credentials)
+	elif tier == 'manual':
+		if not client_id or not client_secret:
+			frappe.throw(_("Client ID and Client Secret are required for manual setup"))
+
+		# Save to OAuth Credentials Settings (user-specific)
+		save_oauth_credentials([{
+			"provider": provider,
+			"client_id": client_id,
+			"client_secret": client_secret
+		}])
+
+		return {
+			"success": True,
+			"message": f"OAuth credentials for {provider} saved successfully",
+			"tier": "manual",
+			"ready_to_connect": True
+		}
+
+	# AI tier is handled by the AI wizard separately
+	else:
+		return {
+			"success": True,
+			"message": "AI setup will be handled by AI wizard",
+			"tier": "ai"
+		}
 
 
 @frappe.whitelist()
