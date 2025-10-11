@@ -14,6 +14,7 @@ declare module 'vue' {
     CallToAction: typeof import('./src/components/CallToAction.vue')['default']
     ConfirmModal: typeof import('./src/components/ConfirmModal.vue')['default']
     FeatureGrid: typeof import('./src/components/FeatureGrid.vue')['default']
+    GoogleAISetupWizard: typeof import('./src/components/GoogleAISetupWizard.vue')['default']
     HeroSection: typeof import('./src/components/HeroSection.vue')['default']
     IntegrationCard: typeof import('./src/components/onboarding/IntegrationCard.vue')['default']
     IntegrationItem: typeof import('./src/components/IntegrationItem.vue')['default']
