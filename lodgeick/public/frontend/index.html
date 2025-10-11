@@ -5,49 +5,83 @@
     <!-- This prevents "Cannot read properties of undefined" errors from frappe-ui -->
     <script>
       // Complete Frappe Framework shim for standalone frappe-ui
-      window.frappe = {
-        _messages: {},
-        boot: { lang: 'en', sysdefaults: {}, user: {} },
-        csrf_token: null,
-        datetime: {},
-        form: {},
-        listview_settings: {},
-        model: {
-          docinfo: {},
-          get_docinfo: function() { return {} },
-          get_value: function() { return Promise.resolve() },
-          set_value: function() { return Promise.resolve() },
-        },
-        pages: {},
-        provide: function() {},
-        require: function() { return Promise.resolve() },
-        route_options: null,
-        templates: {},
-        ui: {
-          ScriptManager: function() {
-            this.load = function() { return Promise.resolve() }
-            this.loaded = {}
+      // This MUST run before any other scripts (including Vite client)
+      ;(function() {
+        if (window.frappe) {
+          console.log('[Frappe Shim - index.html] window.frappe already exists, skipping')
+          return
+        }
+
+        console.log('[Frappe Shim - index.html] Initializing window.frappe...')
+
+        window.frappe = {
+          _messages: {},
+          boot: { lang: 'en', sysdefaults: {}, user: {} },
+          csrf_token: null,
+          datetime: {},
+          form: {},
+          listview_settings: {},
+          model: {
+            docinfo: {},
+            get_docinfo: function() { return {} },
+            get_value: function() { return Promise.resolve() },
+            set_value: function() { return Promise.resolve() },
           },
-          FieldGroup: function() {},
-          Dialog: function() {},
-          form_builders: {},
-          toolbar: {},
-        },
-        utils: {
-          get_url_arg: function() { return null },
-          get_query_params: function() { return {} },
-        },
-        call: function() { return Promise.resolve({ message: {} }) },
-        xcall: function() { return Promise.resolve() },
-        db: {
-          get_value: function() { return Promise.resolve() },
-          get_list: function() { return Promise.resolve([]) },
-        },
-      }
-      window.site_name = 'lodgeick.com'
-      window.cur_frm = null
-      window.cur_list = null
-      window.cur_dialog = null
+          pages: {},
+          provide: function() {},
+          require: function() { return Promise.resolve() },
+          route_options: null,
+          templates: {},
+          ui: {
+            ScriptManager: function() {
+              this.load = function() { return Promise.resolve() }
+              this.loaded = {}
+            },
+            FieldGroup: function() {},
+            Dialog: function() {},
+            form_builders: {},
+            toolbar: {},
+          },
+          utils: {
+            get_url_arg: function() { return null },
+            get_query_params: function() { return {} },
+          },
+          call: function() { return Promise.resolve({ message: {} }) },
+          xcall: function() { return Promise.resolve() },
+          db: {
+            get_value: function() { return Promise.resolve() },
+            get_list: function() { return Promise.resolve([]) },
+          },
+        }
+        window.site_name = 'lodgeick.com'
+        window.cur_frm = null
+        window.cur_list = null
+        window.cur_dialog = null
+
+        console.log('[Frappe Shim - index.html] Initialized successfully')
+        console.log('[Frappe Shim - index.html] frappe.ui:', window.frappe.ui)
+        console.log('[Frappe Shim - index.html] frappe.ui.ScriptManager:', window.frappe.ui.ScriptManager)
+
+        // Monitor frappe.ui for modifications using a defensive getter/setter
+        var _ui = window.frappe.ui;
+        Object.defineProperty(window.frappe, 'ui', {
+          get: function() {
+            if (!_ui || !_ui.ScriptManager) {
+              console.error('[Frappe Shim] WARNING: frappe.ui or ScriptManager is missing!', _ui)
+              console.trace('[Frappe Shim] Stack trace of access:')
+            }
+            return _ui;
+          },
+          set: function(newValue) {
+            console.warn('[Frappe Shim] WARNING: Something is trying to overwrite frappe.ui!', newValue)
+            console.trace('[Frappe Shim] Stack trace of setter:')
+            _ui = newValue;
+          },
+          configurable: false
+        });
+
+        console.log('[Frappe Shim - index.html] Protection enabled for frappe.ui')
+      })()
     </script>
 
     <meta charset="UTF-8" />
@@ -55,8 +89,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lodgeick - One-Click Integrations</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script type="module" crossorigin src="/assets/index-BRa8Y8OH.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CTKPsa32.css">
+    <script type="module" crossorigin src="/assets/index-BXa9JWwl.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DxlQzCF1.css">
   </head>
   <body>
     <div id="app"></div>
