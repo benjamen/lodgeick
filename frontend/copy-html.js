@@ -11,19 +11,24 @@ const targetPath = path.join(__dirname, '..', 'lodgeick', 'www', 'lodgeick.html'
 
 let html = fs.readFileSync(builtIndexPath, 'utf-8');
 
-// Fix asset paths to use Frappe's asset serving structure
-// Replace /assets/ with /assets/lodgeick/frontend/assets/
-html = html.replace(/\/assets\//g, '/assets/lodgeick/frontend/assets/');
-
-// Fix favicon path
+// Fix favicon path first
 html = html.replace('href="/favicon.png"', 'href="/assets/lodgeick/frontend/favicon.png"');
 
 // Extract all module scripts from anywhere in the HTML
 const moduleScriptRegex = /<script\s+type="module"[^>]*>[\s\S]*?<\/script>|<script\s+type="module"[^>]*\/>/g;
-const moduleScripts = html.match(moduleScriptRegex) || [];
+let moduleScripts = html.match(moduleScriptRegex) || [];
+
+// Fix asset paths in module scripts
+moduleScripts = moduleScripts.map(script =>
+  script.replace(/\/assets\//g, '/assets/lodgeick/frontend/assets/')
+);
 
 // Remove module scripts from their current positions
 html = html.replace(moduleScriptRegex, '');
+
+// Now fix asset paths in the remaining HTML
+// Replace /assets/ with /assets/lodgeick/frontend/assets/
+html = html.replace(/\/assets\//g, '/assets/lodgeick/frontend/assets/');
 
 // Prepare minimal frappe initialization + boot script
 // This provides just enough for frappe-ui without breaking /desk and /app routes
