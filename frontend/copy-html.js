@@ -23,40 +23,10 @@ html = html.replace(moduleScriptRegex, '');
 
 // Vite's base path already adds /assets/lodgeick/frontend/, so no path fixing needed
 
-// Prepare minimal frappe initialization + boot script
-// This provides just enough for frappe-ui without breaking /desk and /app routes
+// Prepare boot data script (frappe shim is already in <head>)
 const initScript = `
     <script>
-      // Initialize minimal frappe object to prevent ReferenceErrors
-      // This allows the Vue SPA to work while /desk and /app get the real Frappe framework
-      if (!window.frappe) {
-        window.frappe = {
-          session: { user: '{{ user if user else "Guest" }}' },
-          csrf_token: '{{ csrf_token if csrf_token else "" }}',
-          boot: {
-            lang: 'en',
-            sysdefaults: {},
-            user: '{{ user if user else "Guest" }}',
-            user_roles: []
-          },
-          form: {},
-          ui: {
-            ScriptManager: function() {
-              this.load = function() { return Promise.resolve() }
-              this.loaded = {}
-            }
-          },
-          call: function() { return Promise.resolve({ message: {} }) },
-          xcall: function() { return Promise.resolve() },
-        };
-      }
-
-      // Set additional globals
-      window.site_name = '{{ site_name if site_name else "localhost" }}';
-      window.csrf_token = '{{ csrf_token if csrf_token else "" }}';
-      window.cur_frm = null;
-
-      // Frappe boot data
+      // Frappe boot data - frappe object is already initialized in <head>
       {% for key in boot %}
       window["{{ key }}"] = {{ boot[key] | tojson }};
       {% endfor %}
