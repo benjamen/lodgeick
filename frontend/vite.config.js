@@ -4,10 +4,10 @@ import frappeui from "frappe-ui/vite"
 import { defineConfig } from "vite"
 
 // https://vitejs.dev/config/
-export default defineConfig({
-	// Base path for production - where Frappe serves our assets
-	// This ensures all dynamic imports use the correct path
-	base: "/assets/lodgeick/frontend/",
+export default defineConfig(({ command, mode }) => ({
+	// Base path: "/" for dev, "/assets/lodgeick/frontend/" for production
+	// In dev mode, Vite serves from root, in production Frappe serves from /assets/
+	base: command === 'serve' ? '/' : '/assets/lodgeick/frontend/',
 	plugins: [
 		frappeui({
 			lucideIcons: true,
@@ -54,4 +54,4 @@ export default defineConfig({
 			},
 		},
 	},
-})
+}))
