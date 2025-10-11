@@ -58,9 +58,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import AccountCard from '@/components/AccountCard.vue'
 import IntegrationItem from '@/components/IntegrationItem.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
+
+const router = useRouter()
 
 const integrations = ref([
   {
@@ -97,7 +100,8 @@ const handleDisconnect = (integration) => {
 
 const handleConfigure = (integration) => {
   console.log('Configure integration:', integration)
-  alert(`Configuration panel for ${integration.app_name} coming soon!`)
+  // Navigate to the integrate page where users can manage app connections
+  router.push({ name: 'Integrate' })
 }
 
 const confirmDisconnect = async () => {

@@ -16,6 +16,7 @@ Lodgeick eliminates the complexity of connecting your favorite business tools. U
 - 🔄 **n8n Workflow Engine** - Powerful automation behind the scenes
 - 🚀 **50+ App Catalog** - Popular business applications ready to connect
 - 💡 **Smart Billing Detection** - Only prompts for billing when actually required
+- ⚙️ **Integration Management** - Easy configuration and monitoring of connected apps
 
 ## 🏗️ Architecture
 
