@@ -11,24 +11,17 @@ const targetPath = path.join(__dirname, '..', 'lodgeick', 'www', 'lodgeick.html'
 
 let html = fs.readFileSync(builtIndexPath, 'utf-8');
 
-// Fix favicon path first
+// Fix favicon path (Vite doesn't process this)
 html = html.replace('href="/favicon.png"', 'href="/assets/lodgeick/frontend/favicon.png"');
 
 // Extract all module scripts from anywhere in the HTML
 const moduleScriptRegex = /<script\s+type="module"[^>]*>[\s\S]*?<\/script>|<script\s+type="module"[^>]*\/>/g;
 let moduleScripts = html.match(moduleScriptRegex) || [];
 
-// Fix asset paths in module scripts
-moduleScripts = moduleScripts.map(script =>
-  script.replace(/\/assets\//g, '/assets/lodgeick/frontend/assets/')
-);
-
 // Remove module scripts from their current positions
 html = html.replace(moduleScriptRegex, '');
 
-// Now fix asset paths in the remaining HTML
-// Replace /assets/ with /assets/lodgeick/frontend/assets/
-html = html.replace(/\/assets\//g, '/assets/lodgeick/frontend/assets/');
+// Vite's base path already adds /assets/lodgeick/frontend/, so no path fixing needed
 
 // Prepare minimal frappe initialization + boot script
 // This provides just enough for frappe-ui without breaking /desk and /app routes

@@ -5,9 +5,9 @@ import { defineConfig } from "vite"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	// Base path: "/" for both dev and production
-	// Assets are served from /assets/lodgeick/frontend/ by Frappe
-	base: "/",
+	// Base path for production - where Frappe serves our assets
+	// This ensures all dynamic imports use the correct path
+	base: "/assets/lodgeick/frontend/",
 	plugins: [
 		frappeui({
 			lucideIcons: true,
